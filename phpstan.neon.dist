@@ -1,0 +1,11 @@
+parameters:
+    level: 8
+    paths:
+        - public
+        - src
+        - tests
+    excludePaths:
+        analyse:
+            - tests/Service
+    checkGenericClassInNonGenericObjectType: false
+    checkMissingIterableValueType: false
