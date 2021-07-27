@@ -35,14 +35,15 @@ class CustomerManager
     /**
      * Return an array of Customer objects with pagination.
      */
-    public function getPaginatedCustomers(int $start, int $limit): ?Paginator
+    public function getPaginatedCustomers(int $page): ?Paginator
     {
         $user = $this->security->getUser();
+
         if ($user instanceof User) {
             return $this->paginator->paginate(
                 $this->repository->findAllCustomersByUserQuery($user),
-                $start,
-                $limit
+                $page,
+                5
             );
         }
 
@@ -50,15 +51,49 @@ class CustomerManager
     }
 
     /**
+     * Return a Customer object from the given id.
+     */
+    public function getOneById(int $id): ?Customer
+    {
+        return $this->repository->findOneBy(['id' => $id]);
+    }
+
+    /**
      * If owned by the given User, return a Customer object from the given id.
      */
-    public function getCustomerByIdAndUser(int $id): ?Customer
+    public function getOneByIdAndUser(int $id): ?Customer
     {
         $user = $this->security->getUser();
+
         if ($user instanceof User) {
             return $this->repository->findOneByIdAndUser($id, $user);
         }
 
         return null;
+    }
+
+    /**
+     * Add a new Customer object in database.
+     */
+    public function addNewCustomer(Customer $customer): Customer
+    {
+        $user = $this->security->getUser();
+
+        if ($user instanceof User) {
+            $customer->setUser($user);
+            $this->entityManager->persist($customer);
+            $this->entityManager->flush();
+        }
+
+        return $customer;
+    }
+
+    /**
+     * Delete one Customer for a given id and User.
+     */
+    public function delete(Customer $customer): void
+    {
+        $this->entityManager->remove($customer);
+        $this->entityManager->flush();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
@@ -20,21 +21,35 @@ class Customer
     private int $id;
 
     /**
+     * @Assert\Choice({"Mr.", "Ms.", "Miss"})
      * @ORM\Column(type="string", length=20)
      */
     private string $gender;
 
     /**
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 100,
+     *      minMessage = "Your first name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     * )
      * @ORM\Column(type="string", length=100)
      */
     private string $firstName;
 
     /**
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 100,
+     *      minMessage = "Your last name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your last name cannot be longer than {{ limit }} characters"
+     * )
      * @ORM\Column(type="string", length=100)
      */
     private string $lastName;
 
     /**
+     * @Assert\Valid
      * @ORM\OneToOne(targetEntity=Address::class, cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */

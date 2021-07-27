@@ -2,7 +2,7 @@ nelmio_api_doc:
     documentation:
         info:
             title: BileMo
-            description: BileMo API which provide useful informations for its customers. 
+            description: BileMo is an API service which provide useful informations for its customers. 
             version: 1.0.0
     areas: # to filter documented areas
         path_patterns:

@@ -7,7 +7,7 @@ use Doctrine\ORM\Query;
 class Paginator implements \IteratorAggregate, \Countable
 {
     private int $itemsTotal;
-    private int $start;
+    private int $page;
     private float $pagesTotal;
     private int $offset;
     private int $limit;
@@ -16,17 +16,17 @@ class Paginator implements \IteratorAggregate, \Countable
     /**
      * Hydrates properties of the class.
      */
-    public function paginate(Query $query, int $start = 1, int $limit = 10): self
+    public function paginate(Query $query, int $page = 1, int $limit = 10): self
     {
-        if ($limit <= 0 || $start <= 0) {
+        if ($limit <= 0 || $page <= 0) {
             throw new \LogicException(
-                "Invalid item per page number. Limit: $limit and Page: $start, must be positive non-zero integers"
+                "Invalid item per page number. Limit: $limit and Page: $page, must be positive non-zero integers"
             );
         }
 
-        $this->start = $start;
+        $this->page = $page;
         $this->limit = $limit;
-        $this->offset = ($start - 1) * $limit;
+        $this->offset = ($page - 1) * $limit;
 
         $this->setPagesTotal($query);
         $this->executeQuery($query);
@@ -47,7 +47,7 @@ class Paginator implements \IteratorAggregate, \Countable
 
     public function getPage(): int
     {
-        return $this->start;
+        return $this->page;
     }
 
     public function getPagesTotal(): float

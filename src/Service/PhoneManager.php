@@ -26,12 +26,12 @@ class PhoneManager
     /**
      * Return an array of Phone objects with pagination.
      */
-    public function getPaginatedPhones(int $start, int $limit): Paginator
+    public function getPaginatedPhones(int $page): Paginator
     {
         return $this->paginator->paginate(
             $this->repository->findAllTricksQuery(),
-            $start,
-            $limit
+            $page,
+            5
         );
     }
 

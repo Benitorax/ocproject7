@@ -11,13 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PhoneController extends AbstractController
 {
     /**
+     * Show a paginated list of phones.
+     *
      * @Route("/api/phone", name="phone_index", methods={"GET"})
      */
     public function index(Request $request, PhoneManager $manager): Response
     {
         $phones = $manager->getPaginatedPhones(
-            (int) $request->query->get('start') ?: 1,
-            (int) $request->query->get('limit') ?: 10
+            (int) $request->query->get('page') ?: 1,
         );
 
         return $this->json([
@@ -27,6 +28,8 @@ class PhoneController extends AbstractController
     }
 
     /**
+     * Show a phone.
+     *
      * @Route("/api/phone/{id}", name="phone_show", methods={"GET"})
      */
     public function show(string $id, Request $request, PhoneManager $manager): Response
