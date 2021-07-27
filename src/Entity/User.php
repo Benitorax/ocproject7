@@ -7,12 +7,14 @@ use App\Repository\UserRepository;
 use App\Entity\ContactDetailsTrait;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  */
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use ContactDetailsTrait;
 
@@ -55,9 +57,15 @@ class User
     private Address $address;
 
     /**
-     * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="owner", orphanRemoval=true)
+     * @ORM\Column(type="json")
      */
-    private ArrayCollection $customers;
+    private array $roles = [];
+
+    /**
+     * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @var Collection|Customer[]
+     */
+    private $customers;
 
     public function __construct()
     {
@@ -81,6 +89,9 @@ class User
         return $this;
     }
 
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -141,6 +152,60 @@ class User
         return $this;
     }
 
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
     /**
      * @return Collection|Customer[]
      */
@@ -153,7 +218,7 @@ class User
     {
         if (!$this->customers->contains($customer)) {
             $this->customers[] = $customer;
-            $customer->setOwner($this);
+            $customer->setUser($this);
         }
 
         return $this;
@@ -163,8 +228,8 @@ class User
     {
         if ($this->customers->removeElement($customer)) {
             // set the owning side to null (unless already changed)
-            if ($customer->getOwner() === $this) {
-                $customer->setOwner(null);
+            if ($customer->getUser() === $this) {
+                $customer->setUser(null);
             }
         }
 

@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Customer
 {
+    use ContactDetailsTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -42,7 +44,7 @@ class Customer
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
      * @ORM\JoinColumn(nullable=false)
      */
-    private ?User $owner;
+    private ?User $user;
 
     public function getId(): ?int
     {
@@ -97,14 +99,14 @@ class Customer
         return $this;
     }
 
-    public function getOwner(): ?User
+    public function getUser(): ?User
     {
-        return $this->owner;
+        return $this->user;
     }
 
-    public function setOwner(?User $owner): self
+    public function setUser(?User $user): self
     {
-        $this->owner = $owner;
+        $this->user = $user;
 
         return $this;
     }

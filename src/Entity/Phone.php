@@ -28,9 +28,9 @@ class Phone
     private string $model;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="float")
      */
-    private int $screenSize;
+    private float $screenSize;
 
     /**
      * @ORM\Column(type="integer")
@@ -76,12 +76,12 @@ class Phone
         return $this;
     }
 
-    public function getScreenSize(): ?int
+    public function getScreenSize(): ?float
     {
         return $this->screenSize;
     }
 
-    public function setScreenSize(int $screenSize): self
+    public function setScreenSize(float $screenSize): self
     {
         $this->screenSize = $screenSize;
 
