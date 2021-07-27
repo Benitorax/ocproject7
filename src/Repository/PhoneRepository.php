@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Phone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -47,4 +48,15 @@ class PhoneRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * Return a query for all Phone objects.
+     */
+    public function findAllTricksQuery(): Query
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.model', 'ASC')
+            ->getQuery()
+        ;
+    }
 }

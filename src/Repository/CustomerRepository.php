@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
+use Doctrine\ORM\Query;
 use App\Entity\Customer;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Customer|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +49,33 @@ class CustomerRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * Return a query for all Customer objects owned by the given User.
+     */
+    public function findAllCustomersByUserQuery(User $user): Query
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.lastName', 'ASC')
+            ->addOrderBy('c.firstName', 'ASC')
+            ->getQuery()
+        ;
+    }
+
+    /**
+     * Return a Customer object for a given Id and User.
+     */
+    public function findOneByIdAndUser(int $id, User $user): ?Customer
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id = :id')
+            ->setParameter('id', $id)
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
