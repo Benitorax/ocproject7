@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Repository\CustomerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CustomerRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -61,12 +61,12 @@ class Customer
      */
     private ?User $user;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getGender(): ?string
+    public function getGender(): string
     {
         return $this->gender;
     }
@@ -78,7 +78,7 @@ class Customer
         return $this;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -90,7 +90,7 @@ class Customer
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
@@ -102,7 +102,7 @@ class Customer
         return $this;
     }
 
-    public function getAddress(): ?Address
+    public function getAddress(): Address
     {
         return $this->address;
     }

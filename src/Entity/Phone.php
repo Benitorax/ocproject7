@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\PhoneRepository;
+use OpenApi\Annotations as OA;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PhoneRepository;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -47,12 +50,12 @@ class Phone
      */
     private int $battery;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getBrand(): ?string
+    public function getBrand(): string
     {
         return $this->brand;
     }
@@ -64,7 +67,7 @@ class Phone
         return $this;
     }
 
-    public function getModel(): ?string
+    public function getModel(): string
     {
         return $this->model;
     }
@@ -76,7 +79,7 @@ class Phone
         return $this;
     }
 
-    public function getScreenSize(): ?float
+    public function getScreenSize(): float
     {
         return $this->screenSize;
     }
@@ -88,7 +91,7 @@ class Phone
         return $this;
     }
 
-    public function getWeight(): ?int
+    public function getWeight(): int
     {
         return $this->weight;
     }
@@ -100,7 +103,7 @@ class Phone
         return $this;
     }
 
-    public function getStorage(): ?int
+    public function getStorage(): int
     {
         return $this->storage;
     }
@@ -112,7 +115,7 @@ class Phone
         return $this;
     }
 
-    public function getBattery(): ?int
+    public function getBattery(): int
     {
         return $this->battery;
     }
