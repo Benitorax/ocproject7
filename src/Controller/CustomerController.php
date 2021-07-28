@@ -2,28 +2,40 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Entity\Customer;
-use App\Form\CustomerType;
+use OpenApi\Annotations as OA;
+use App\Form\CreateCustomerType;
 use App\Service\CustomerManager;
+use App\DTO\Customer\ReadCustomer;
+use App\DTO\Customer\CreateCustomer;
 use App\Security\Voter\CustomerVoter;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
+use App\Controller\AppAbstractController;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CustomerController extends AbstractController
+class CustomerController extends AppAbstractController
 {
     /**
-     * Show a paginated list of customers.
+     * Show customers.
      *
      * @Route(
-     *     "/api/customer",
+     *     "/api/customers",
      *     name="api_customer_index",
      *     methods={"GET"}
      * )
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns a paginated list of customer",
+     *     @OA\JsonContent(@OA\Schema(
+     *       type="array",
+     *       @OA\Items(ref=@Model(type=ReadCustomer::class))
+     *     ))
+     * )
+     * @OA\Tag(name="customers")
      */
     public function index(Request $request, CustomerManager $manager): Response
     {
@@ -41,12 +53,22 @@ class CustomerController extends AbstractController
      * Show a customer.
      *
      * @Route(
-     *     "/api/customer/{id}",
+     *     "/api/customers/{id}",
      *     name="api_customer_show",
      *     methods={"GET"}
      * )
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns detailed informations about a customer",
+     *     @OA\JsonContent(
+     *       ref=@Model(type=ReadCustomer::class)
+     *     )
+     * )
+     * @OA\Parameter(ref="#/components/parameters/id")
+     * @OA\Tag(name="customers")
      */
-    public function show(string $id, Request $request, CustomerManager $manager): Response
+    public function show(string $id, CustomerManager $manager): Response
     {
         $customer = $manager->getOneByIdAndUser((int) $id);
 
@@ -57,14 +79,26 @@ class CustomerController extends AbstractController
      * Create a customer.
      *
      * @Route(
-     *     "/api/customer",
+     *     "/api/customers",
      *     name="api_customer_create",
      *     methods={"POST"}
      * )
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Return the created customer",
+     *     @OA\JsonContent(
+     *         ref=@Model(type=ReadCustomer::class)
+     *     )
+     * )
+     * @OA\RequestBody(@OA\JsonContent(
+     *       ref=@Model(type=CreateCustomer::class)
+     * ))
+     * @OA\Tag(name="customers")
      */
     public function create(Request $request, CustomerManager $manager): Response
     {
-        $form = $this->createForm(CustomerType::class);
+        $form = $this->createForm(CreateCustomerType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -72,7 +106,7 @@ class CustomerController extends AbstractController
 
             return $this->json($customer);
         }
-        dd($form);
+
         return $this->json($this->getErrorsFromForm($form));
     }
 
@@ -80,39 +114,26 @@ class CustomerController extends AbstractController
      * Delete a customer.
      *
      * @Route(
-     *     "/api/customer/{id}",
+     *     "/api/customers/{id}",
      *     name="api_customer_delete",
      *     methods={"DELETE"}
      * )
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Return the delete customer",
+     *     @OA\JsonContent(
+     *       ref=@Model(type=ReadCustomer::class)
+     *     )
+     * )
+     * @OA\Parameter(ref="#/components/parameters/id")
+     * @OA\Tag(name="customers")
      */
     public function delete(Customer $customer, Request $request, CustomerManager $manager): Response
     {
         $this->denyAccessUnlessGranted(CustomerVoter::DELETE, $customer);
         $manager->delete($customer);
 
-        return $this->json([]);
-    }
-
-    /**
-     * Return an array of errors from Form object.
-     */
-    private function getErrorsFromForm(FormInterface $form): array
-    {
-        $errors = [];
-
-        foreach ($form->getErrors() as $error) {
-            /** @var FormError $error */
-            $errors[] = $error->getMessage();
-        }
-
-        foreach ($form->all() as $childForm) {
-            if ($childForm instanceof FormInterface) {
-                if ($childErrors = $this->getErrorsFromForm($childForm)) {
-                    $errors[$childForm->getName()] = $childErrors;
-                }
-            }
-        }
-
-        return $errors;
+        return $this->json($customer);
     }
 }

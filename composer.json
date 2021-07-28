@@ -15,6 +15,7 @@
         "fakerphp/faker": "^1.15",
         "nelmio/api-doc-bundle": "^4.4",
         "phpdocumentor/reflection-docblock": "^5.2",
+        "symfony/asset": "5.3.*",
         "symfony/console": "5.3.*",
         "symfony/dotenv": "5.3.*",
         "symfony/flex": "^1.3.1",
@@ -26,8 +27,11 @@
         "symfony/runtime": "5.3.*",
         "symfony/security-bundle": "5.3.*",
         "symfony/serializer": "5.3.*",
+        "symfony/twig-bundle": "5.3.*",
         "symfony/validator": "5.3.*",
-        "symfony/yaml": "5.3.*"
+        "symfony/yaml": "5.3.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",

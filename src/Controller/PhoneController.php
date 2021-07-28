@@ -2,18 +2,32 @@
 
 namespace App\Controller;
 
+use App\DTO\Phone\ReadPhone;
 use App\Service\PhoneManager;
+use OpenApi\Annotations as OA;
+use App\Controller\AppAbstractController;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class PhoneController extends AbstractController
+class PhoneController extends AppAbstractController
 {
     /**
-     * Show a paginated list of phones.
+     * Show phones.
      *
-     * @Route("/api/phone", name="phone_index", methods={"GET"})
+     * @Route("/api/phones", name="phone_index", methods={"GET"})
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns a paginated list of phones",
+     *     @OA\JsonContent(@OA\Schema(
+     *       type="array",
+     *       @OA\Items(ref=@Model(type=ReadPhone::class))
+     *     ))
+     * )
+     * @OA\Tag(name="phones")
      */
     public function index(Request $request, PhoneManager $manager): Response
     {
@@ -28,11 +42,21 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * Show a phone.
+     * Show phone.
      *
-     * @Route("/api/phone/{id}", name="phone_show", methods={"GET"})
+     * @Route("/api/phones/{id}", name="phone_show", methods={"GET"})
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns detailed informations about a phone",
+     *     @OA\JsonContent(
+     *       ref=@Model(type=ReadPhone::class)
+     *     )
+     * )
+     * @OA\Parameter(ref="#/components/parameters/id")
+     * @OA\Tag(name="phones")
      */
-    public function show(string $id, Request $request, PhoneManager $manager): Response
+    public function show(string $id, PhoneManager $manager): Response
     {
         $phone = $manager->getPhoneById((int) $id);
 
