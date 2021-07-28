@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\DataTransformerInterface;
 use Doctrine\ORM\Query;
 
 class Paginator implements \IteratorAggregate, \Countable
@@ -12,12 +13,17 @@ class Paginator implements \IteratorAggregate, \Countable
     private int $offset;
     private int $limit;
     private array $items = [];
+    private ?DataTransformerInterface $dataTransformer = null;
 
     /**
      * Hydrates properties of the class.
      */
-    public function paginate(Query $query, int $page = 1, int $limit = 10): self
-    {
+    public function paginate(
+        Query $query,
+        int $page = 1,
+        int $limit = 10,
+        DataTransformerInterface $dataTransformer = null
+    ): self {
         if ($limit <= 0 || $page <= 0) {
             throw new \LogicException(
                 "Invalid item per page number. Limit: $limit and Page: $page, must be positive non-zero integers"
@@ -31,6 +37,10 @@ class Paginator implements \IteratorAggregate, \Countable
         $this->setPagesTotal($query);
         $this->executeQuery($query);
 
+        if (null === $dataTransformer) {
+            $this->dataTransformer = $dataTransformer;
+        }
+
         return $this;
     }
 
@@ -39,10 +49,17 @@ class Paginator implements \IteratorAggregate, \Countable
      */
     public function executeQuery(Query $query): void
     {
-        $this->items = $query
+        $items = $query
             ->setFirstResult($this->offset)
             ->setMaxResults($this->limit)
             ->getResult();
+
+        if (null !== $this->dataTransformer) {
+            $this->items = $this->dataTransformer->transform($items);
+            return;
+        }
+
+        $this->items = $items;
     }
 
     public function getPage(): int

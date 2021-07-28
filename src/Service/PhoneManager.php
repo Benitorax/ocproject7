@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\Phone\ReadPhoneDataTransformer;
 use App\Entity\Phone;
 use App\Service\Paginator;
 use App\Repository\PhoneRepository;
@@ -31,7 +32,8 @@ class PhoneManager
         return $this->paginator->paginate(
             $this->repository->findAllTricksQuery(),
             $page,
-            5
+            5,
+            new ReadPhoneDataTransformer()
         );
     }
 

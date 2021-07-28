@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\Customer\ReadCustomerDataTransformer;
 use App\Entity\User;
 use App\Entity\Customer;
 use App\Service\Paginator;
@@ -43,7 +44,8 @@ class CustomerManager
             return $this->paginator->paginate(
                 $this->repository->findAllCustomersByUserQuery($user),
                 $page,
-                5
+                5,
+                new ReadCustomerDataTransformer()
             );
         }
 
