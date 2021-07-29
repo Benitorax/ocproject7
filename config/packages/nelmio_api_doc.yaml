@@ -13,9 +13,55 @@ nelmio_api_doc:
                     required: true
                     schema:
                         type: integer
+            securitySchemes:
+                BearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT    
 
-        # security:
-        #     - Bearer: ['123']
+        paths:
+            /api/login_check:
+                post:
+                    tags:
+                        - Security
+                    summary: Log in the user.
+                    description: Set your email and password. If credentials valid, it returns a JWT.
+                    parameters:
+                    - name: username
+                      in: path
+                      description: user email
+                      required: true
+                      schema:
+                        type: string
+                      example: contact@company.com
+                    - name: password
+                      in: path
+                      description: user password
+                      required: true
+                      schema:
+                        type: string
+                      example: 123456
+                    responses:
+                        '200':
+                            description: Return a JWT.
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                example: eyJ0...NiJ9.eyJp...bSJ9.NcYH...3yuA
+                        '400':
+                            description: Invalid JSON.
+                        '401':
+                            description: Invalid credentials.
+
+
+
+
+        security:
+            - BearerAuth: []
     areas:
         path_patterns: # an array of regexps
             - ^/api(?!/doc$)
