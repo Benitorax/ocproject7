@@ -10,12 +10,14 @@ use App\DataFixtures\Data\DataGenerator;
 use App\Entity\Customer;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class UserFixtures extends Fixture
 {
     private UserPasswordHasherInterface $passwordHasher;
     private DataGenerator $dataGenerator;
     private Generator $faker;
+    private SluggerInterface $slugger;
 
     private const GENDER = [
         'Mr.' => 'male',
@@ -24,11 +26,13 @@ class UserFixtures extends Fixture
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
-        DataGenerator $dataGenerator
+        DataGenerator $dataGenerator,
+        SluggerInterface $slugger
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->dataGenerator = $dataGenerator;
         $this->faker = Factory::create();
+        $this->slugger = $slugger;
     }
 
     public function load(ObjectManager $manager): void
@@ -57,7 +61,7 @@ class UserFixtures extends Fixture
             ->setBusiness($this->dataGenerator->companyBusiness())
             ->setLegalStatus($this->dataGenerator->companyLegalStatus())
             ->setSize($this->dataGenerator->companySize())
-            ->setEmail('contact@' . strtolower($companyName) . 'com')
+            ->setEmail('contact@' . strtolower($this->slugger->slug($companyName)) . '.com')
             ->setPhoneNumber($this->faker->e164PhoneNumber())
             ->setAddress($this->dataGenerator->getNewAddress())
         ;
