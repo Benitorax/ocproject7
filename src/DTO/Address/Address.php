@@ -2,13 +2,13 @@
 
 namespace App\DTO\Address;
 
-use App\Entity\Address;
+use App\Entity\Address as EntityAddress;
 use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema
  */
-class DTOAddress
+class Address
 {
     /**
      * @OA\Property(
@@ -70,7 +70,7 @@ class DTOAddress
         return $this;
     }
 
-    public static function createFromAddress(Address $address): self
+    public static function createFromAddress(EntityAddress $address): self
     {
         return (new self())
             ->setAddress($address->getAddress())
@@ -79,9 +79,9 @@ class DTOAddress
         ;
     }
 
-    public function createAddress(): Address
+    public function createAddress(): EntityAddress
     {
-        return (new Address())
+        return (new EntityAddress())
             ->setAddress($this->address)
             ->setCity($this->city)
             ->setZipCode($this->zipCode)

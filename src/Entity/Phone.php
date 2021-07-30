@@ -6,7 +6,6 @@ use OpenApi\Annotations as OA;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PhoneRepository;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)

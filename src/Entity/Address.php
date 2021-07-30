@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use OpenApi\Annotations as OA;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AddressRepository;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -27,10 +26,6 @@ class Address
      *      maxMessage = "Your address cannot be longer than {{ limit }} characters"
      * )
      * @ORM\Column(type="string", length=255)
-     * @OA\Property(
-     *    description="Street address.",
-     *    example="8364 Neva Light"
-     * )
      */
     private string $address;
 
@@ -42,10 +37,6 @@ class Address
      *      maxMessage = "Your city cannot be longer than {{ limit }} characters"
      * )
      * @ORM\Column(type="string", length=100)
-     * @OA\Property(
-     *    description="City.",
-     *    example="Hillland"
-     * )
      */
     private string $city;
 
@@ -57,10 +48,6 @@ class Address
      *      maxMessage = "Your ZIP code cannot be longer than {{ limit }} characters"
      * )
      * @ORM\Column(type="string", length=10)
-     * @OA\Property(
-     *    description="ZIP code.",
-     *    example="88619-7139"
-     * )
      */
     private string $zipCode;
 

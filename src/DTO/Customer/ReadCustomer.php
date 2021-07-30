@@ -4,7 +4,7 @@ namespace App\DTO\Customer;
 
 use App\Entity\Customer;
 use OpenApi\Annotations as OA;
-use App\DTO\Address\DTOAddress;
+use App\DTO\Address\Address;
 use App\DTO\ContactDetailsTrait;
 
 /**
@@ -47,7 +47,7 @@ class ReadCustomer
      */
     private string $lastName;
 
-    private DTOAddress $address;
+    private Address $address;
 
     public function getId(): ?int
     {
@@ -97,12 +97,12 @@ class ReadCustomer
         return $this;
     }
 
-    public function getAddress(): ?DTOAddress
+    public function getAddress(): ?Address
     {
         return $this->address;
     }
 
-    public function setAddress(DTOAddress $address): self
+    public function setAddress(Address $address): self
     {
         $this->address = $address;
 
@@ -116,7 +116,7 @@ class ReadCustomer
             ->setGender($customer->getGender())
             ->setFirstName($customer->getFirstName())
             ->setLastName($customer->getLastName())
-            ->setAddress(DTOAddress::createFromAddress($customer->getAddress()))
+            ->setAddress(Address::createFromAddress($customer->getAddress()))
             ->setPhoneNumber($customer->getPhoneNumber())
             ->setEmail($customer->getEmail())
         ;

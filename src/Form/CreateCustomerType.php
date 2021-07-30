@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Email;
 
 class CreateCustomerType extends AbstractType
 {
@@ -60,10 +61,13 @@ class CreateCustomerType extends AbstractType
                     'description' => 'Email address.',
                 ],
                 'constraints' => [
-                    'min' => 10,
-                    'max' => 255,
-                    'minMessage' => "Your email must be at least {{ limit }} characters long",
-                    'maxMessage' => "Your email cannot be longer than {{ limit }} characters",
+                    new Length([
+                        'min' => 10,
+                        'max' => 255,
+                        'minMessage' => "Your email must be at least {{ limit }} characters long",
+                        'maxMessage' => "Your email cannot be longer than {{ limit }} characters",
+                    ]),
+                    new Email(),
                 ],
             ])
             ->add('phoneNumber', TextType::class, [
@@ -89,6 +93,7 @@ class CreateCustomerType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => CreateCustomer::class,
+            'csrf_protection' => false,
         ]);
     }
 }
