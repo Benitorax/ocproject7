@@ -53,6 +53,8 @@ class PhoneController extends AppAbstractController
      *       ref=@Model(type=ReadPhone::class)
      *     )
      * )
+     * @OA\Response(response=403, description="Access denied.")
+     * @OA\Response(response=404, description="Phone not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
      * @OA\Tag(name="phones")
      */
