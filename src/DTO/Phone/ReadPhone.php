@@ -150,7 +150,7 @@ class ReadPhone
         return $this;
     }
 
-    public static function createFromPhone(Phone $phone): ReadPhone
+    public static function createFromPhone(Phone $phone): self
     {
         return (new self())
             ->setId($phone->getId())

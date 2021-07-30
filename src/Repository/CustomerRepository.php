@@ -56,6 +56,8 @@ class CustomerRepository extends ServiceEntityRepository
     public function findAllCustomersByUserQuery(User $user): Query
     {
         return $this->createQueryBuilder('c')
+            ->leftJoin('c.address', 'a')
+            ->addSelect('a')
             ->andWhere('c.user = :user')
             ->setParameter('user', $user)
             ->orderBy('c.lastName', 'ASC')
@@ -70,6 +72,8 @@ class CustomerRepository extends ServiceEntityRepository
     public function findOneByIdAndUser(int $id, User $user): ?Customer
     {
         return $this->createQueryBuilder('c')
+            ->leftJoin('c.address', 'a')
+            ->addSelect('a')
             ->andWhere('c.id = :id')
             ->setParameter('id', $id)
             ->andWhere('c.user = :user')

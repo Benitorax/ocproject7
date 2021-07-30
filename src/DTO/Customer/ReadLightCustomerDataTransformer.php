@@ -3,16 +3,16 @@
 namespace App\DTO\Customer;
 
 use App\Entity\Customer;
-use App\DTO\Customer\ReadCustomer;
+use App\DTO\Customer\ReadLightCustomer;
 use App\DTO\DataTransformerInterface;
 
-class ReadCustomerDataTransformer implements DataTransformerInterface
+class ReadLightCustomerDataTransformer implements DataTransformerInterface
 {
     /**
-     * Transform a Customer object(s) to ReadCustomer object(s).
+     * Transform a Customer object(s) to ReadLightCustomer object(s).
      *
      * @param Customer|Customer[] $data
-     * @return ReadCustomer|ReadCustomer[]
+     * @return ReadLightCustomer|ReadLightCustomer[]
      */
     public function transform($data)
     {
@@ -26,17 +26,17 @@ class ReadCustomerDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transform a Customer object to ReadCustomer object.
+     * Transform a Customer object to ReadLightCustomer object.
      */
-    public function transformCustomer(Customer $customer): ReadCustomer
+    public function transformCustomer(Customer $customer): ReadLightCustomer
     {
-        return ReadCustomer::createFromCustomer($customer);
+        return ReadLightCustomer::createFromCustomer($customer);
     }
 
     /**
-     * Transform a Customer objects to ReadCustomer objects.
+     * Transform a Customer objects to ReadLightCustomer objects.
      * @param Customer[] $customers
-     * @return ReadCustomer[]
+     * @return ReadLightCustomer[]
      */
     public function transformCustomers($customers)
     {

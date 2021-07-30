@@ -3,16 +3,16 @@
 namespace App\DTO\Phone;
 
 use App\Entity\Phone;
-use App\DTO\Phone\ReadPhone;
+use App\DTO\Phone\ReadLightPhone;
 use App\DTO\DataTransformerInterface;
 
-class ReadPhoneDataTransformer implements DataTransformerInterface
+class ReadLightPhoneDataTransformer implements DataTransformerInterface
 {
     /**
-     * Transform a Phone object(s) to ReadPhone object(s).
+     * Transform a Phone object(s) to ReadLightPhone object(s).
      *
      * @param Phone|Phone[] $data
-     * @return ReadPhone|ReadPhone[]
+     * @return ReadLightPhone|ReadLightPhone[]
      */
     public function transform($data)
     {
@@ -26,17 +26,17 @@ class ReadPhoneDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transform a Phone object to ReadPhone object.
+     * Transform a Phone object to ReadLightPhone object.
      */
-    public function transformPhone(Phone $phone): ReadPhone
+    public function transformPhone(Phone $phone): ReadLightPhone
     {
-        return ReadPhone::createFromPhone($phone);
+        return ReadLightPhone::createFromPhone($phone);
     }
 
     /**
-     * Transform a Phone objects to ReadPhone objects.
+     * Transform a Phone objects to ReadLightPhone objects.
      * @param Phone[] $phones
-     * @return ReadPhone[]
+     * @return ReadLightPhone[]
      */
     public function transformPhones($phones)
     {
