@@ -20,10 +20,18 @@ class CreateCustomerType extends AbstractType
             ->add('gender', TextType::class, [
                 'documentation' => [
                     'type' => 'string',
-                    'description' => 'Gender: "Mr.", "Ms." or "Miss".',
+                    'description' => 'Gender: Mr., Ms. or Miss.',
                 ],
                 'constraints' => [
-                    new Choice(['Mr.', 'Ms.', 'Miss']),
+                    new Choice(
+                        ['Mr.', 'Ms.', 'Miss'],
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        'Gender should be "Mr.", "Ms." or "Miss"'
+                    ),
                 ],
             ])
             ->add('firstName', TextType::class, [

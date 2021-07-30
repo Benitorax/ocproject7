@@ -16,6 +16,7 @@
         "lexik/jwt-authentication-bundle": "^2.12",
         "nelmio/api-doc-bundle": "^4.4",
         "phpdocumentor/reflection-docblock": "^5.2",
+        "sensio/framework-extra-bundle": "^6.1",
         "symfony/asset": "5.3.*",
         "symfony/console": "5.3.*",
         "symfony/dotenv": "5.3.*",

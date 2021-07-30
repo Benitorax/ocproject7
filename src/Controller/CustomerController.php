@@ -11,6 +11,7 @@ use App\DTO\Customer\CreateCustomer;
 use App\Security\Voter\CustomerVoter;
 use App\Controller\AppAbstractController;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Component\Form\FormInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,9 +69,11 @@ class CustomerController extends AppAbstractController
      * @OA\Parameter(ref="#/components/parameters/id")
      * @OA\Tag(name="customers")
      */
-    public function show(string $id, CustomerManager $manager): Response
+    public function show(Customer $customer, CustomerManager $manager): Response
     {
-        $customer = $manager->getOneByIdAndUser((int) $id);
+        $this->denyAccessUnlessGranted(CustomerVoter::VIEW, $customer);
+
+        $customer = $manager->getReadCustomer($customer);
 
         return $this->json($customer);
     }
@@ -99,7 +102,8 @@ class CustomerController extends AppAbstractController
     public function create(Request $request, CustomerManager $manager): Response
     {
         $form = $this->createForm(CreateCustomerType::class);
-        $form->handleRequest($request);
+        $data = json_decode((string) $request->getContent(), true);
+        $form->submit($data);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $customer = $manager->addNewCustomer($form->getData());
@@ -107,7 +111,7 @@ class CustomerController extends AppAbstractController
             return $this->json($customer);
         }
 
-        return $this->json($this->getErrorsFromForm($form));
+        return $this->json($this->getErrorsFromForm($form), 422);
     }
 
     /**
@@ -121,7 +125,7 @@ class CustomerController extends AppAbstractController
      *
      * @OA\Response(
      *     response=200,
-     *     description="Return the delete customer",
+     *     description="Return the deleted customer",
      *     @OA\JsonContent(
      *       ref=@Model(type=ReadCustomer::class)
      *     )
@@ -129,10 +133,10 @@ class CustomerController extends AppAbstractController
      * @OA\Parameter(ref="#/components/parameters/id")
      * @OA\Tag(name="customers")
      */
-    public function delete(Customer $customer, Request $request, CustomerManager $manager): Response
+    public function delete(Customer $customer, CustomerManager $manager): Response
     {
         $this->denyAccessUnlessGranted(CustomerVoter::DELETE, $customer);
-        $manager->delete($customer);
+        $customer = $manager->delete($customer);
 
         return $this->json($customer);
     }

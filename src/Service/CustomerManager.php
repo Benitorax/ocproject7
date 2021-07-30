@@ -2,13 +2,15 @@
 
 namespace App\Service;
 
-use App\DTO\Customer\ReadCustomerDataTransformer;
 use App\Entity\User;
 use App\Entity\Customer;
 use App\Service\Paginator;
+use App\DTO\Customer\ReadCustomer;
+use App\DTO\Customer\CreateCustomer;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
+use App\DTO\Customer\ReadCustomerDataTransformer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class CustomerManager
@@ -63,23 +65,18 @@ class CustomerManager
     /**
      * If owned by the given User, return a Customer object from the given id.
      */
-    public function getOneByIdAndUser(int $id): ?Customer
+    public function getReadCustomer(Customer $customer): ReadCustomer
     {
-        $user = $this->security->getUser();
-
-        if ($user instanceof User) {
-            return $this->repository->findOneByIdAndUser($id, $user);
-        }
-
-        return null;
+        return ReadCustomer::createFromCustomer($customer);
     }
 
     /**
      * Add a new Customer object in database.
      */
-    public function addNewCustomer(Customer $customer): Customer
+    public function addNewCustomer(CreateCustomer $createCustomer): ReadCustomer
     {
         $user = $this->security->getUser();
+        $customer = $createCustomer->createCustomer();
 
         if ($user instanceof User) {
             $customer->setUser($user);
@@ -87,15 +84,20 @@ class CustomerManager
             $this->entityManager->flush();
         }
 
-        return $customer;
+        return ReadCustomer::createFromCustomer($customer);
     }
 
     /**
      * Delete one Customer for a given id and User.
      */
-    public function delete(Customer $customer): void
+    public function delete(Customer $customer): ReadCustomer
     {
+        // execute the line below before flush because "id" won't be initialized anymore
+        $readCustomer = ReadCustomer::createFromCustomer($customer);
+
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
+
+        return $readCustomer;
     }
 }

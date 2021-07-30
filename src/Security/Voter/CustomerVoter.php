@@ -11,10 +11,11 @@ class CustomerVoter extends Voter
 {
     public const EDIT = 'POST_EDIT';
     public const DELETE = 'POST_DELETE';
+    public const VIEW = 'POST_VIEW';
 
     protected function supports(string $attribute, $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::DELETE])
+        return in_array($attribute, [self::EDIT, self::DELETE, self::VIEW])
             && $subject instanceof \App\Entity\Customer;
     }
 
@@ -30,9 +31,8 @@ class CustomerVoter extends Voter
         $customer = $subject;
 
         switch ($attribute) {
-            case self::EDIT:
-                // return $this->canEdit($customer, $user);
-                break;
+            case self::VIEW:
+                return $this->canView($customer, $user);
             case self::DELETE:
                 return $this->canDelete($customer, $user);
         }
@@ -44,6 +44,14 @@ class CustomerVoter extends Voter
      * Check whether the User is the owner of the Customer.
      */
     public function canDelete(Customer $customer, UserInterface $user): bool
+    {
+        return $this->canView($customer, $user);
+    }
+
+    /**
+     * Check whether the User is the owner of the Customer.
+     */
+    public function canView(Customer $customer, UserInterface $user): bool
     {
         return $user === $customer->getUser();
     }
