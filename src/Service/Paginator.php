@@ -33,13 +33,10 @@ class Paginator implements \IteratorAggregate, \Countable
         $this->page = $page;
         $this->limit = $limit;
         $this->offset = ($page - 1) * $limit;
+        $this->dataTransformer = $dataTransformer;
 
         $this->setPagesTotal($query);
         $this->executeQuery($query);
-
-        if (null === $dataTransformer) {
-            $this->dataTransformer = $dataTransformer;
-        }
 
         return $this;
     }
@@ -56,6 +53,7 @@ class Paginator implements \IteratorAggregate, \Countable
 
         if (null !== $this->dataTransformer) {
             $this->items = $this->dataTransformer->transform($items);
+
             return;
         }
 

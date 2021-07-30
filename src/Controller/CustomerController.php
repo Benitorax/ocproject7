@@ -44,10 +44,7 @@ class CustomerController extends AppAbstractController
             (int) $request->query->get('page') ?: 1
         );
 
-        return $this->json([
-            $customers,
-            '_links' => 'Welcome to your new controller!'
-        ]);
+        return $this->json($customers);
     }
 
     /**

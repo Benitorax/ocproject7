@@ -17,7 +17,7 @@ class PhoneController extends AppAbstractController
     /**
      * Show phones.
      *
-     * @Route("/api/phones", name="phone_index", methods={"GET"})
+     * @Route("/api/phones", name="api_phone_index", methods={"GET"})
      *
      * @OA\Response(
      *     response=200,
@@ -35,16 +35,13 @@ class PhoneController extends AppAbstractController
             (int) $request->query->get('page') ?: 1,
         );
 
-        return $this->json([
-            $phones,
-            '_links' => 'Welcome to your new controller!'
-        ]);
+        return $this->json($phones);
     }
 
     /**
      * Show phone.
      *
-     * @Route("/api/phones/{id}", name="phone_show", methods={"GET"})
+     * @Route("/api/phones/{id}", name="api_phone_show", methods={"GET"})
      *
      * @OA\Response(
      *     response=200,
