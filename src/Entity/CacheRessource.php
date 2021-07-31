@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\CacheRessourceRepository;
+use App\Entity\TimestampTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CacheRessourceRepository;
 
 /**
  * @ORM\Entity(repositoryClass=CacheRessourceRepository::class)
  */
 class CacheRessource
 {
+    use TimestampTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -36,6 +39,18 @@ class CacheRessource
      * @ORM\Column(type="text")
      */
     private string $content = '';
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $userId;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+        $this->updatedAt = new \DateTimeImmutable('now');
+    }
+
 
     public function getId(): ?int
     {
@@ -86,6 +101,18 @@ class CacheRessource
     public function setContent(string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(int $userId): self
+    {
+        $this->userId = $userId;
 
         return $this;
     }

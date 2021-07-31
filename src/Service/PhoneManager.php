@@ -2,12 +2,14 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Entity\Phone;
 use App\Service\Paginator;
 use App\DTO\Phone\ReadPhone;
 use App\HAL\HalRessourceMaker;
 use App\Service\RessourceCache;
 use App\Repository\PhoneRepository;
+use Symfony\Component\Security\Core\Security;
 use App\DTO\Phone\ReadLightPhoneDataTransformer;
 
 class PhoneManager
@@ -16,17 +18,46 @@ class PhoneManager
     private HalRessourceMaker $halMaker;
     private RessourceCache $cache;
     private Paginator $paginator;
+    private User $user;
 
     public function __construct(
         PhoneRepository $repository,
         HalRessourceMaker $halMaker,
         RessourceCache $cache,
-        Paginator $paginator
+        Paginator $paginator,
+        Security $security
     ) {
         $this->repository = $repository;
         $this->halMaker = $halMaker;
         $this->cache = $cache;
         $this->paginator = $paginator;
+
+        /** @var User */
+        $user = $security->getUser();
+        $this->user = $user;
+    }
+
+    /**
+     * Get etag of several phones.
+     */
+    public function getPhonesEtag(int $page): string
+    {
+        $paginator = $this->paginator->paginate(
+            $this->repository->findAllTricksQuery(),
+            $page,
+            4
+        );
+
+        // prevDatetime will be the most recent date
+        $prevDatetime = null;
+        foreach ($paginator->getItems() as $phone) {
+            $nextDatetime = $phone->getUpdatedAt();
+            if ($nextDatetime > $prevDatetime) {
+                $prevDatetime = $nextDatetime;
+            }
+        }
+
+        return md5($prevDatetime->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -34,7 +65,7 @@ class PhoneManager
      */
     public function getCachePaginatedPhones(int $page): string
     {
-        return $this->cache->get(Phone::class, null, $page);
+        return $this->cache->get($this->user->getId(), Phone::class, null, $page);
     }
 
     /**
@@ -50,7 +81,7 @@ class PhoneManager
         );
 
         $phones = $this->halMaker->makePaginatorRessource($paginator);
-        $this->cache->cache(Phone::class, null, $page, $phones);
+        $this->cache->cache($this->user->getId(), Phone::class, null, $page, $phones);
 
         return $phones;
     }
@@ -60,7 +91,7 @@ class PhoneManager
      */
     public function getCacheReadPhone(Phone $phone): string
     {
-        return $this->cache->get(Phone::class, $phone->getId());
+        return $this->cache->get($this->user->getId(), Phone::class, $phone->getId());
     }
 
     /**
@@ -69,7 +100,7 @@ class PhoneManager
     public function getReadPhone(Phone $phone): string
     {
         $halPhone = $this->convertToHalRessource($phone);
-        $this->cache->cache(Phone::class, $phone->getId(), null, $halPhone);
+        $this->cache->cache($this->user->getId(), Phone::class, $phone->getId(), null, $halPhone);
 
         return $halPhone;
     }

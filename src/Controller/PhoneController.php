@@ -34,16 +34,16 @@ class PhoneController extends AppAbstractController
     {
         $page = (int) $request->query->get('page') ?: 1;
 
-        $cachePhones = $manager->getCachePaginatedPhones($page);
-        $response = $this->jsonResponseWithEtag($cachePhones);
+        $etag = $manager->getPhonesEtag($page);
 
-        if ($response->isNotModified($request)) {
-            return $response;
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cachePhones = $manager->getCachePaginatedPhones($page);
+            return $this->jsonResponseWithEtag($cachePhones, $etag);
         }
 
         $phones = $manager->getPaginatedPhones($page);
 
-        return $this->jsonResponseWithEtag($phones);
+        return $this->jsonResponseWithEtag($phones, $etag);
     }
 
     /**
@@ -65,15 +65,15 @@ class PhoneController extends AppAbstractController
      */
     public function show(Phone $phone, PhoneManager $manager, Request $request): Response
     {
-        $cachePhone = $manager->getCacheReadPhone($phone);
-        $response = $this->jsonResponseWithEtag($cachePhone);
+        $etag = $this->getEntityEtag($phone);
 
-        if ($response->isNotModified($request)) {
-            return $response;
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cachePhone = $manager->getCacheReadPhone($phone);
+            return $this->jsonResponseWithEtag($cachePhone, $etag);
         }
 
         $phone = $manager->getReadPhone($phone);
 
-        return $this->jsonResponseWithEtag($phone);
+        return $this->jsonResponseWithEtag($phone, $etag);
     }
 }

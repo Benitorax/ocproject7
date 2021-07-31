@@ -9,7 +9,7 @@ class HalPaginator
     /**
      * @var Link[]
      */
-    private $_links = [];
+    private $links = [];
 
     /**
      * Number of items in this page.
@@ -31,15 +31,15 @@ class HalPaginator
      */
     public function getLinks()
     {
-        return $this->_links;
+        return $this->links;
     }
 
     /**
-     * @param Link[] $_links
+     * @param Link[] $links
      */
-    public function setLinks($_links): self
+    public function setLinks($links): self
     {
-        $this->_links = $_links;
+        $this->links = $links;
 
         return $this;
     }

@@ -42,16 +42,16 @@ class CustomerController extends AppAbstractController
     {
         $page = (int) $request->query->get('page') ?: 1;
 
-        $cacheCustomers = $manager->getCachePaginatedCustomers($page);
-        $response = $this->jsonResponseWithEtag($cacheCustomers);
+        $etag = $manager->getCustomersEtag($page);
 
-        if ($response->isNotModified($request)) {
-            return $response;
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cacheCustomers = $manager->getCachePaginatedCustomers($page);
+            return $this->jsonResponseWithEtag($cacheCustomers, $etag);
         }
 
         $customers = $manager->getPaginatedCustomers($page);
 
-        return $this->jsonResponseWithEtag($customers);
+        return $this->jsonResponseWithEtag($customers, $etag);
     }
 
     /**
@@ -79,16 +79,16 @@ class CustomerController extends AppAbstractController
     {
         $this->denyAccessUnlessGranted(CustomerVoter::VIEW, $customer);
 
-        $cacheCustomer = $manager->getCacheReadCustomer($customer);
-        $response = $this->jsonResponseWithEtag($cacheCustomer);
+        $etag = $this->getEntityEtag($customer);
 
-        if ($response->isNotModified($request)) {
-            return $response;
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cacheCustomer = $manager->getCacheReadCustomer($customer);
+            return $this->jsonResponseWithEtag($cacheCustomer, $etag);
         }
 
         $customer = $manager->getReadCustomer($customer);
 
-        return $this->jsonResponseWithEtag($customer);
+        return $this->jsonResponseWithEtag($customer, $etag);
     }
 
     /**

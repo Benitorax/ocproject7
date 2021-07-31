@@ -20,8 +20,8 @@ class CustomerManager
     private RessourceCache $cache;
     private EntityManagerInterface $entityManager;
     private HalRessourceMaker $halMaker;
-    private Security $security;
     private Paginator $paginator;
+    private User $user;
 
     public function __construct(
         CustomerRepository $repository,
@@ -35,8 +35,34 @@ class CustomerManager
         $this->cache = $cache;
         $this->entityManager = $entityManager;
         $this->halMaker = $halMaker;
-        $this->security = $security;
         $this->paginator = $paginator;
+
+        /** @var User */
+        $user = $security->getUser();
+        $this->user = $user;
+    }
+
+    /**
+     * Get etag of several phones.
+     */
+    public function getCustomersEtag(int $page): string
+    {
+        $paginator = $this->paginator->paginate(
+            $this->repository->findAllCustomersByUserQuery($this->user),
+            $page,
+            4
+        );
+
+        // prevDatetime will be the most recent date
+        $prevDatetime = null;
+        foreach ($paginator->getItems() as $phone) {
+            $nextDatetime = $phone->getUpdatedAt();
+            if ($nextDatetime > $prevDatetime) {
+                $prevDatetime = $nextDatetime;
+            }
+        }
+
+        return md5($prevDatetime->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -44,7 +70,7 @@ class CustomerManager
      */
     public function getCachePaginatedCustomers(int $page): string
     {
-        return $this->cache->get(Customer::class, null, $page);
+        return $this->cache->get($this->user->getId(), Customer::class, null, $page);
     }
 
     /**
@@ -52,23 +78,17 @@ class CustomerManager
      */
     public function getPaginatedCustomers(int $page): string
     {
-        $user = $this->security->getUser();
+        $paginator = $this->paginator->paginate(
+            $this->repository->findAllCustomersByUserQuery($this->user),
+            $page,
+            4,
+            new ReadLightCustomerDataTransformer()
+        );
 
-        if ($user instanceof User) {
-            $paginator = $this->paginator->paginate(
-                $this->repository->findAllCustomersByUserQuery($user),
-                $page,
-                4,
-                new ReadLightCustomerDataTransformer()
-            );
+        $halCustomers = $this->halMaker->makePaginatorRessource($paginator);
+        $this->cache->cache($this->user->getId(), Customer::class, null, $page, $halCustomers);
 
-            $halCustomers = $this->halMaker->makePaginatorRessource($paginator);
-            $this->cache->cache(Customer::class, null, $page, $halCustomers);
-
-            return $halCustomers;
-        }
-
-        return '';
+        return $halCustomers;
     }
 
     /**
@@ -76,7 +96,7 @@ class CustomerManager
      */
     public function getCacheReadCustomer(Customer $customer): string
     {
-        return $this->cache->get(Customer::class, $customer->getId());
+        return $this->cache->get($this->user->getId(), Customer::class, $customer->getId());
     }
 
     /**
@@ -85,7 +105,7 @@ class CustomerManager
     public function getReadCustomer(Customer $customer): string
     {
         $halCustomer = $this->convertToHalRessource($customer);
-        $this->cache->cache(Customer::class, $customer->getId(), null, $halCustomer);
+        $this->cache->cache($this->user->getId(), Customer::class, $customer->getId(), null, $halCustomer);
 
         return $halCustomer;
     }
@@ -95,14 +115,10 @@ class CustomerManager
      */
     public function addNewCustomer(CreateCustomer $createCustomer): string
     {
-        $user = $this->security->getUser();
         $customer = $createCustomer->createCustomer();
-
-        if ($user instanceof User) {
-            $customer->setUser($user);
-            $this->entityManager->persist($customer);
-            $this->entityManager->flush();
-        }
+        $customer->setUser($this->user);
+        $this->entityManager->persist($customer);
+        $this->entityManager->flush();
 
         return $this->convertToHalRessource($customer);
     }
