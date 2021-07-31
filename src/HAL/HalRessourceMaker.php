@@ -10,6 +10,7 @@ use App\HAL\RessourceLinkMaker;
 use App\DTO\Phone\ReadLightPhone;
 use App\DTO\Customer\ReadCustomer;
 use App\DTO\Customer\ReadLightCustomer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class HalRessourceMaker
 {
@@ -20,16 +21,20 @@ class HalRessourceMaker
         ReadPhone::class => 'Phone',
     ];
     private RessourceLinkMaker $linkMaker;
+    private SerializerInterface $serializer;
 
-    public function __construct(RessourceLinkMaker $linkMaker)
-    {
+    public function __construct(
+        RessourceLinkMaker $linkMaker,
+        SerializerInterface $serializer
+    ) {
         $this->linkMaker = $linkMaker;
+        $this->serializer = $serializer;
     }
 
     /**
      * Create HalPaginator object from a Paginator object.
      */
-    public function makePaginatorRessource(Paginator $paginator): HalPaginator
+    public function makePaginatorRessource(Paginator $paginator): string
     {
         // transform items to HalRessource objects
         $items = [];
@@ -37,35 +42,39 @@ class HalRessourceMaker
             $items[] = $this->makeLightRessource($item);
         }
 
-        return (new HalPaginator())
+        $paginator = (new HalPaginator())
             ->setCount($paginator->count())
             ->setTotal($paginator->getItemsTotal())
             ->setEmbedded($items)
             ->setLinks($this->linkMaker->makePaginationLinks($paginator))
         ;
+
+        return $this->serializer->serialize($paginator, 'json');
     }
 
     /**
      * Create HalRessource object from a given ressource object.
      */
-    public function makeRessource(object $ressource): HalRessource
+    public function makeRessource(object $ressource): string
     {
         if (!method_exists($ressource, 'getId')) {
             throw new \Exception('Ressource object must define getId method to generate id for HAL ressource.');
         }
 
-        return (new HalRessource())
+        $ressource = (new HalRessource())
             ->setId($ressource->getId())
             ->settype($this->getClassName($ressource))
             ->setRessource($ressource)
             ->setLinks($this->linkMaker->makeLinks($ressource))
         ;
+
+        return $this->serializer->serialize($ressource, 'json');
     }
 
     /**
      * Create HalRessource object from a given ressource object.
      */
-    public function makeLightRessource(object $ressource): HalRessource
+    private function makeLightRessource(object $ressource): HalRessource
     {
         if (!method_exists($ressource, 'getId')) {
             throw new \Exception('Ressource object must define getId method to generate id for HAL ressource.');

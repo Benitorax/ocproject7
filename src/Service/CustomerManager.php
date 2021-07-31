@@ -4,10 +4,9 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Entity\Customer;
-use App\HAL\HalPaginator;
-use App\HAL\HalRessource;
 use App\Service\Paginator;
 use App\HAL\HalRessourceMaker;
+use App\Service\RessourceCache;
 use App\DTO\Customer\ReadCustomer;
 use App\DTO\Customer\CreateCustomer;
 use App\Repository\CustomerRepository;
@@ -18,6 +17,7 @@ use App\DTO\Customer\ReadLightCustomerDataTransformer;
 class CustomerManager
 {
     private CustomerRepository $repository;
+    private RessourceCache $cache;
     private EntityManagerInterface $entityManager;
     private HalRessourceMaker $halMaker;
     private Security $security;
@@ -25,12 +25,14 @@ class CustomerManager
 
     public function __construct(
         CustomerRepository $repository,
+        RessourceCache $cache,
         EntityManagerInterface $entityManager,
         HalRessourceMaker $halMaker,
         Security $security,
         Paginator $paginator
     ) {
         $this->repository = $repository;
+        $this->cache = $cache;
         $this->entityManager = $entityManager;
         $this->halMaker = $halMaker;
         $this->security = $security;
@@ -38,9 +40,17 @@ class CustomerManager
     }
 
     /**
-     * Return an array of Customer objects with pagination.
+     * Return a cached collection of customers with pagination from the given page.
      */
-    public function getPaginatedCustomers(int $page): ?HalPaginator
+    public function getCachePaginatedCustomers(int $page): string
+    {
+        return $this->cache->get(Customer::class, null, $page);
+    }
+
+    /**
+     * Return a collection of customers with pagination from the given page.
+     */
+    public function getPaginatedCustomers(int $page): string
     {
         $user = $this->security->getUser();
 
@@ -52,32 +62,38 @@ class CustomerManager
                 new ReadLightCustomerDataTransformer()
             );
 
-            return $this->halMaker->makePaginatorRessource($paginator);
+            $halCustomers = $this->halMaker->makePaginatorRessource($paginator);
+            $this->cache->cache(Customer::class, null, $page, $halCustomers);
+
+            return $halCustomers;
         }
 
-        return null;
+        return '';
     }
 
     /**
-     * Return a Customer object from the given id.
+     * Return a cached Customer from the given Customer object.
      */
-    public function getOneById(int $id): ?Customer
+    public function getCacheReadCustomer(Customer $customer): string
     {
-        return $this->repository->findOneBy(['id' => $id]);
+        return $this->cache->get(Customer::class, $customer->getId());
     }
 
     /**
-     * If owned by the given User, return a Customer object from the given id.
+     * If owned by the given User, return a Customer from the given Customer object.
      */
-    public function getReadCustomer(Customer $customer): HalRessource
+    public function getReadCustomer(Customer $customer): string
     {
-        return $this->convertToHalRessource($customer);
+        $halCustomer = $this->convertToHalRessource($customer);
+        $this->cache->cache(Customer::class, $customer->getId(), null, $halCustomer);
+
+        return $halCustomer;
     }
 
     /**
      * Add a new Customer object in database.
      */
-    public function addNewCustomer(CreateCustomer $createCustomer): HalRessource
+    public function addNewCustomer(CreateCustomer $createCustomer): string
     {
         $user = $this->security->getUser();
         $customer = $createCustomer->createCustomer();
@@ -94,7 +110,7 @@ class CustomerManager
     /**
      * Delete one Customer for a given id and User.
      */
-    public function delete(Customer $customer): HalRessource
+    public function delete(Customer $customer): string
     {
         // execute the line below before flush because "id" won't be initialized anymore
         $readCustomer = $this->convertToHalRessource($customer);
@@ -109,7 +125,7 @@ class CustomerManager
     /**
      * Convert a Customer to Customer HalRessource.
      */
-    private function convertToHalRessource(Customer $customer): HalRessource
+    private function convertToHalRessource(Customer $customer): string
     {
         return $this->halMaker->makeRessource(ReadCustomer::createFromCustomer($customer));
     }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Phone;
 use App\DTO\Phone\ReadPhone;
 use App\Service\PhoneManager;
 use OpenApi\Annotations as OA;
@@ -31,11 +32,18 @@ class PhoneController extends AppAbstractController
      */
     public function index(Request $request, PhoneManager $manager): Response
     {
-        $phones = $manager->getPaginatedPhones(
-            (int) $request->query->get('page') ?: 1,
-        );
+        $page = (int) $request->query->get('page') ?: 1;
 
-        return $this->json($phones);
+        $cachePhones = $manager->getCachePaginatedPhones($page);
+        $response = $this->jsonResponseWithEtag($cachePhones);
+
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
+        $phones = $manager->getPaginatedPhones($page);
+
+        return $this->jsonResponseWithEtag($phones);
     }
 
     /**
@@ -55,10 +63,17 @@ class PhoneController extends AppAbstractController
      * @OA\Parameter(ref="#/components/parameters/id")
      * @OA\Tag(name="phones")
      */
-    public function show(string $id, PhoneManager $manager): Response
+    public function show(Phone $phone, PhoneManager $manager, Request $request): Response
     {
-        $phone = $manager->getPhoneById((int) $id);
+        $cachePhone = $manager->getCacheReadPhone($phone);
+        $response = $this->jsonResponseWithEtag($cachePhone);
 
-        return $this->json($phone);
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
+        $phone = $manager->getReadPhone($phone);
+
+        return $this->jsonResponseWithEtag($phone);
     }
 }

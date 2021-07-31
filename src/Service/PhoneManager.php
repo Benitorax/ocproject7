@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
-use App\HAL\HalPaginator;
-use App\HAL\HalRessource;
+use App\Entity\Phone;
 use App\Service\Paginator;
 use App\DTO\Phone\ReadPhone;
 use App\HAL\HalRessourceMaker;
+use App\Service\RessourceCache;
 use App\Repository\PhoneRepository;
 use App\DTO\Phone\ReadLightPhoneDataTransformer;
 
@@ -14,22 +14,33 @@ class PhoneManager
 {
     private PhoneRepository $repository;
     private HalRessourceMaker $halMaker;
+    private RessourceCache $cache;
     private Paginator $paginator;
 
     public function __construct(
         PhoneRepository $repository,
         HalRessourceMaker $halMaker,
+        RessourceCache $cache,
         Paginator $paginator
     ) {
         $this->repository = $repository;
         $this->halMaker = $halMaker;
+        $this->cache = $cache;
         $this->paginator = $paginator;
     }
 
     /**
-     * Return an array of Phone objects with pagination.
+     * Return a cached collection of phones with pagination from the given page
      */
-    public function getPaginatedPhones(int $page): HalPaginator
+    public function getCachePaginatedPhones(int $page): string
+    {
+        return $this->cache->get(Phone::class, null, $page);
+    }
+
+    /**
+     * Return a collection of phones with pagination from the given page.
+     */
+    public function getPaginatedPhones(int $page): string
     {
         $paginator = $this->paginator->paginate(
             $this->repository->findAllTricksQuery(),
@@ -38,20 +49,36 @@ class PhoneManager
             new ReadLightPhoneDataTransformer()
         );
 
-        return $this->halMaker->makePaginatorRessource($paginator);
+        $phones = $this->halMaker->makePaginatorRessource($paginator);
+        $this->cache->cache(Phone::class, null, $page, $phones);
+
+        return $phones;
     }
 
     /**
-     * Return a Phone object from the given id.
+     * Return a cached phone from the given Phone object.
      */
-    public function getPhoneById(int $id): ?HalRessource
+    public function getCacheReadPhone(Phone $phone): string
     {
-        $phone = $this->repository->findOneBy(['id' => $id]);
+        return $this->cache->get(Phone::class, $phone->getId());
+    }
 
-        if (null !== $phone) {
-            return $this->halMaker->makeRessource(ReadPhone::createFromPhone($phone));
-        }
+    /**
+     * Return a phone from the given Phone object.
+     */
+    public function getReadPhone(Phone $phone): string
+    {
+        $halPhone = $this->convertToHalRessource($phone);
+        $this->cache->cache(Phone::class, $phone->getId(), null, $halPhone);
 
-        return null;
+        return $halPhone;
+    }
+
+    /**
+     * Convert a Phone to Customer HalRessource.
+     */
+    private function convertToHalRessource(Phone $phone): string
+    {
+        return $this->halMaker->makeRessource(ReadPhone::createFromPhone($phone));
     }
 }
