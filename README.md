@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3294e813c18d4005a5e4efa90e429f2b)](https://www.codacy.com/gh/Benitorax/ocproject7/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Benitorax/ocproject7&amp;utm_campaign=Badge_Grade)
+
 # Project as part of OpenClassrooms training
 
 The project is developed with Symfony, its components and bundles. It's an API application (built without API Platform) where users are business companies who has customers.
