@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\TimestampTrait;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Entity\ContactDetailsTrait;
@@ -17,6 +18,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use ContactDetailsTrait;
+    use TimestampTrait;
 
     /**
      * @ORM\Id
@@ -71,9 +73,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->customers = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable('now');
+        $this->updatedAt = new \DateTimeImmutable('now');
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }

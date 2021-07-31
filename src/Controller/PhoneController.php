@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Phone;
 use App\DTO\Phone\ReadPhone;
 use App\Service\PhoneManager;
 use OpenApi\Annotations as OA;
@@ -17,7 +18,7 @@ class PhoneController extends AppAbstractController
     /**
      * Show phones.
      *
-     * @Route("/api/phones", name="phone_index", methods={"GET"})
+     * @Route("/api/phones", name="api_phone_index", methods={"GET"})
      *
      * @OA\Response(
      *     response=200,
@@ -31,20 +32,24 @@ class PhoneController extends AppAbstractController
      */
     public function index(Request $request, PhoneManager $manager): Response
     {
-        $phones = $manager->getPaginatedPhones(
-            (int) $request->query->get('page') ?: 1,
-        );
+        $page = (int) $request->query->get('page') ?: 1;
 
-        return $this->json([
-            $phones,
-            '_links' => 'Welcome to your new controller!'
-        ]);
+        $etag = $manager->getPhonesEtag($page);
+
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cachePhones = $manager->getCachePaginatedPhones($page);
+            return $this->jsonResponseWithEtag($cachePhones, $etag);
+        }
+
+        $phones = $manager->getPaginatedPhones($page);
+
+        return $this->jsonResponseWithEtag($phones, $etag);
     }
 
     /**
      * Show phone.
      *
-     * @Route("/api/phones/{id}", name="phone_show", methods={"GET"})
+     * @Route("/api/phones/{id}", name="api_phone_show", methods={"GET"})
      *
      * @OA\Response(
      *     response=200,
@@ -58,10 +63,17 @@ class PhoneController extends AppAbstractController
      * @OA\Parameter(ref="#/components/parameters/id")
      * @OA\Tag(name="phones")
      */
-    public function show(string $id, PhoneManager $manager): Response
+    public function show(Phone $phone, PhoneManager $manager, Request $request): Response
     {
-        $phone = $manager->getPhoneById((int) $id);
+        $etag = $this->getEntityEtag($phone);
 
-        return $this->json($phone);
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cachePhone = $manager->getCacheReadPhone($phone);
+            return $this->jsonResponseWithEtag($cachePhone, $etag);
+        }
+
+        $phone = $manager->getReadPhone($phone);
+
+        return $this->jsonResponseWithEtag($phone, $etag);
     }
 }

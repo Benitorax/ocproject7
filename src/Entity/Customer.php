@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\TimestampTrait;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CustomerRepository;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Customer
 {
     use ContactDetailsTrait;
+    use TimestampTrait;
 
     /**
      * @ORM\Id
@@ -60,6 +62,12 @@ class Customer
      * @ORM\JoinColumn(nullable=false)
      */
     private ?User $user;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+        $this->updatedAt = new \DateTimeImmutable('now');
+    }
 
     public function getId(): int
     {

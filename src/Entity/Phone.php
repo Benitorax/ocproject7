@@ -12,6 +12,8 @@ use Nelmio\ApiDocBundle\Annotation\Model;
  */
 class Phone
 {
+    use TimestampTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -48,6 +50,12 @@ class Phone
      * @ORM\Column(type="integer")
      */
     private int $battery;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+        $this->updatedAt = new \DateTimeImmutable('now');
+    }
 
     public function getId(): int
     {

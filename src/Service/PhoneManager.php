@@ -2,46 +2,114 @@
 
 namespace App\Service;
 
-use App\DTO\Phone\ReadPhoneDataTransformer;
+use App\Entity\User;
 use App\Entity\Phone;
 use App\Service\Paginator;
+use App\DTO\Phone\ReadPhone;
+use App\HAL\HalRessourceMaker;
+use App\Service\RessourceCache;
 use App\Repository\PhoneRepository;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Core\Security;
+use App\DTO\Phone\ReadLightPhoneDataTransformer;
 
 class PhoneManager
 {
     private PhoneRepository $repository;
-    private SerializerInterface $serializer;
+    private HalRessourceMaker $halMaker;
+    private RessourceCache $cache;
     private Paginator $paginator;
+    private User $user;
 
     public function __construct(
         PhoneRepository $repository,
-        SerializerInterface $serializer,
-        Paginator $paginator
+        HalRessourceMaker $halMaker,
+        RessourceCache $cache,
+        Paginator $paginator,
+        Security $security
     ) {
         $this->repository = $repository;
-        $this->serializer = $serializer;
+        $this->halMaker = $halMaker;
+        $this->cache = $cache;
         $this->paginator = $paginator;
+
+        /** @var User */
+        $user = $security->getUser();
+        $this->user = $user;
     }
 
     /**
-     * Return an array of Phone objects with pagination.
+     * Get etag of several phones.
      */
-    public function getPaginatedPhones(int $page): Paginator
+    public function getPhonesEtag(int $page): string
     {
-        return $this->paginator->paginate(
+        $paginator = $this->paginator->paginate(
             $this->repository->findAllTricksQuery(),
             $page,
-            5,
-            new ReadPhoneDataTransformer()
+            4
         );
+
+        // prevDatetime will be the most recent date
+        $prevDatetime = null;
+        foreach ($paginator->getItems() as $phone) {
+            $nextDatetime = $phone->getUpdatedAt();
+            if ($nextDatetime > $prevDatetime) {
+                $prevDatetime = $nextDatetime;
+            }
+        }
+
+        return md5($prevDatetime->format('Y-m-d H:i:s'));
     }
 
     /**
-     * Return a Phone object from the given id.
+     * Return a cached collection of phones with pagination from the given page
      */
-    public function getPhoneById(int $id): ?Phone
+    public function getCachePaginatedPhones(int $page): string
     {
-        return $this->repository->findOneBy(['id' => $id]);
+        return $this->cache->get($this->user->getId(), Phone::class, null, $page);
+    }
+
+    /**
+     * Return a collection of phones with pagination from the given page.
+     */
+    public function getPaginatedPhones(int $page): string
+    {
+        $paginator = $this->paginator->paginate(
+            $this->repository->findAllTricksQuery(),
+            $page,
+            4,
+            new ReadLightPhoneDataTransformer()
+        );
+
+        $phones = $this->halMaker->makePaginatorRessource($paginator);
+        $this->cache->cache($this->user->getId(), Phone::class, null, $page, $phones);
+
+        return $phones;
+    }
+
+    /**
+     * Return a cached phone from the given Phone object.
+     */
+    public function getCacheReadPhone(Phone $phone): string
+    {
+        return $this->cache->get($this->user->getId(), Phone::class, $phone->getId());
+    }
+
+    /**
+     * Return a phone from the given Phone object.
+     */
+    public function getReadPhone(Phone $phone): string
+    {
+        $halPhone = $this->convertToHalRessource($phone);
+        $this->cache->cache($this->user->getId(), Phone::class, $phone->getId(), null, $halPhone);
+
+        return $halPhone;
+    }
+
+    /**
+     * Convert a Phone to Customer HalRessource.
+     */
+    private function convertToHalRessource(Phone $phone): string
+    {
+        return $this->halMaker->makeRessource(ReadPhone::createFromPhone($phone));
     }
 }

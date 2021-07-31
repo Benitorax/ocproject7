@@ -11,11 +11,11 @@ use App\DTO\Customer\CreateCustomer;
 use App\Security\Voter\CustomerVoter;
 use App\Controller\AppAbstractController;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Component\Form\FormInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CustomerController extends AppAbstractController
 {
@@ -40,14 +40,18 @@ class CustomerController extends AppAbstractController
      */
     public function index(Request $request, CustomerManager $manager): Response
     {
-        $customers = $manager->getPaginatedCustomers(
-            (int) $request->query->get('page') ?: 1
-        );
+        $page = (int) $request->query->get('page') ?: 1;
 
-        return $this->json([
-            $customers,
-            '_links' => 'Welcome to your new controller!'
-        ]);
+        $etag = $manager->getCustomersEtag($page);
+
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cacheCustomers = $manager->getCachePaginatedCustomers($page);
+            return $this->jsonResponseWithEtag($cacheCustomers, $etag);
+        }
+
+        $customers = $manager->getPaginatedCustomers($page);
+
+        return $this->jsonResponseWithEtag($customers, $etag);
     }
 
     /**
@@ -71,13 +75,20 @@ class CustomerController extends AppAbstractController
      * @OA\Parameter(ref="#/components/parameters/id")
      * @OA\Tag(name="customers")
      */
-    public function show(Customer $customer, CustomerManager $manager): Response
+    public function show(Customer $customer, CustomerManager $manager, Request $request): Response
     {
         $this->denyAccessUnlessGranted(CustomerVoter::VIEW, $customer);
 
+        $etag = $this->getEntityEtag($customer);
+
+        if ($this->isResponseNotModified($etag, $request)) {
+            $cacheCustomer = $manager->getCacheReadCustomer($customer);
+            return $this->jsonResponseWithEtag($cacheCustomer, $etag);
+        }
+
         $customer = $manager->getReadCustomer($customer);
 
-        return $this->json($customer);
+        return $this->jsonResponseWithEtag($customer, $etag);
     }
 
     /**

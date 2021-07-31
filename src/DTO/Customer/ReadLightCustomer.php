@@ -5,15 +5,12 @@ namespace App\DTO\Customer;
 use App\Entity\Customer;
 use OpenApi\Annotations as OA;
 use App\DTO\Address\Address;
-use App\DTO\ContactDetailsTrait;
 
 /**
  * @OA\Schema
  */
-class ReadCustomer
+class ReadLightCustomer
 {
-    use ContactDetailsTrait;
-
     /**
      * @OA\Property(
      *    description="The unique identifier of the ressource.",
@@ -46,8 +43,6 @@ class ReadCustomer
      * )
      */
     private string $lastName;
-
-    private Address $address;
 
     public function getId(): ?int
     {
@@ -97,18 +92,6 @@ class ReadCustomer
         return $this;
     }
 
-    public function getAddress(): ?Address
-    {
-        return $this->address;
-    }
-
-    public function setAddress(Address $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
     public static function createFromCustomer(Customer $customer): self
     {
         return (new self())
@@ -116,9 +99,6 @@ class ReadCustomer
             ->setGender($customer->getGender())
             ->setFirstName($customer->getFirstName())
             ->setLastName($customer->getLastName())
-            ->setAddress(Address::createFromAddress($customer->getAddress()))
-            ->setPhoneNumber($customer->getPhoneNumber())
-            ->setEmail($customer->getEmail())
         ;
     }
 }

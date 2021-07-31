@@ -82,9 +82,9 @@ class Address
     public function createAddress(): EntityAddress
     {
         return (new EntityAddress())
-            ->setAddress($this->address)
-            ->setCity($this->city)
-            ->setZipCode($this->zipCode)
+            ->setAddress($this->getAddress())
+            ->setCity($this->getCity())
+            ->setZipCode($this->getZipCode())
         ;
     }
 }
