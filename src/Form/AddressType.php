@@ -53,7 +53,7 @@ class AddressType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                     new Length([
-                        'min' => 10,
+                        'min' => 5,
                         'max' => 10,
                         'minMessage' => "The ZIP code must be at least {{ limit }} characters long",
                         'maxMessage' => "The ZIP code cannot be longer than {{ limit }} characters",

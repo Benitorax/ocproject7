@@ -38,8 +38,12 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "phpstan/phpstan": "^0.12.93",
+        "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "^3.6",
-        "symfony/maker-bundle": "^1.33"
+        "symfony/browser-kit": "^5.3",
+        "symfony/css-selector": "^5.3",
+        "symfony/maker-bundle": "^1.33",
+        "symfony/phpunit-bridge": "^5.3"
     },
     "config": {
         "optimize-autoloader": true,
