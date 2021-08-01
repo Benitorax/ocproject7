@@ -2,7 +2,7 @@
 
 # Project as part of OpenClassrooms training
 
-The project is developed with Symfony, its components and bundles. It's an API application (built without API Platform) where users are business companies who has customers.
+The project is developed with Symfony, its components and bundles. It's an API application (built without API Platform) where users are business companies who has customers and who can view a catalog of mobile phones.
 
 Users can use endpoints to:
 
@@ -14,7 +14,7 @@ Users can use endpoints to:
 -   view a list of mobile phones
 -   view detaild informations about a mobile phone.
 
-Only logged users can use those endpoints.
+Only logged users can access those endpoints (except login).
 
 ## Getting started
 ### Step 1: Configure environment variables
@@ -61,4 +61,4 @@ symfony serve -d
 ```
 
 ### Step 7: View endpoints
-To see the list of available endpoints, go to: `127.0.0.1:8000/api/doc`.
+To see the list of all available endpoints, go to: `127.0.0.1:8000/api/doc`.
