@@ -41,7 +41,6 @@ class CustomerController extends AppAbstractController
     public function index(Request $request, CustomerManager $manager): Response
     {
         $page = (int) $request->query->get('page') ?: 1;
-
         $etag = $manager->getCustomersEtag($page);
 
         if ($this->isResponseNotModified($etag, $request)) {
@@ -124,7 +123,7 @@ class CustomerController extends AppAbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $customer = $manager->addNewCustomer($form->getData());
 
-            return $this->json($customer);
+            return new JsonResponse($customer, 200, [], true);
         }
 
         return $this->json($this->getErrorsFromForm($form), 422);
@@ -156,6 +155,6 @@ class CustomerController extends AppAbstractController
         $this->denyAccessUnlessGranted(CustomerVoter::DELETE, $customer);
         $customer = $manager->delete($customer);
 
-        return $this->json($customer);
+        return new JsonResponse($customer, 200, [], true);
     }
 }

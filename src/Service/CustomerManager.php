@@ -130,7 +130,6 @@ class CustomerManager
     {
         // execute the line below before flush because "id" won't be initialized anymore
         $readCustomer = $this->convertToHalRessource($customer);
-        ;
 
         $this->entityManager->remove($customer);
         $this->entityManager->flush();

@@ -2,21 +2,16 @@
 
 namespace App\Service;
 
-use App\Entity\CacheRessource;
-use App\Repository\CacheRessourceRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class RessourceCache
 {
-    private CacheRessourceRepository $repository;
-    private EntityManagerInterface $entityManager;
+    private CacheInterface $cache;
 
-    public function __construct(
-        CacheRessourceRepository $repository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->repository = $repository;
-        $this->entityManager = $entityManager;
+    public function __construct(CacheInterface $cache)
+    {
+        $this->cache = $cache;
     }
 
     /**
@@ -29,26 +24,12 @@ class RessourceCache
         ?int $page = null,
         string $content
     ): void {
-        $this->checkEntityIdAndPage($entityId, $page);
-        $criteria = $this->buildCriteria($userId, $entityClass, $entityId, $page);
-        $ressource = $this->repository->findOneBy($criteria);
+        $key =  $this->createKey($userId, $entityClass, $entityId, $page);
 
-        if (null === $ressource) {
-            $ressource = (new CacheRessource())
-                ->setUserId($userId)
-                ->setEntityClass($entityClass)
-                ->setEntityId($entityId)
-                ->setPage($page)
-            ;
-        }
-
-        $ressource
-            ->setContent($content)
-            ->setUpdatedAt(new \DateTimeImmutable())
-        ;
-
-        $this->entityManager->persist($ressource);
-        $this->entityManager->flush();
+        $this->cache->delete($key);
+        $this->cache->get($key, function () use ($content) {
+            return $content;
+        });
     }
 
     /**
@@ -56,31 +37,18 @@ class RessourceCache
      */
     public function get(int $userId, string $entityClass, ?int $entityId = null, ?int $page = null): string
     {
-        $this->checkEntityIdAndPage($entityId, $page);
-        $criteria = $this->buildCriteria($userId, $entityClass, $entityId, $page);
-        $cacheRessource = $this->repository->findOneBy($criteria);
+        $item = $this->cache->get(
+            $this->createKey($userId, $entityClass, $entityId, $page),
+            function (ItemInterface $item) {
+                return $item;
+            }
+        );
 
-        if (null !== $cacheRessource) {
-            return $cacheRessource->getContent();
+        if ($item !== null) {
+            return $item;
         }
 
         return '';
-    }
-
-    /**
-     * Remove the ressource(s) from database.
-     */
-    public function delete(int $userId, string $entityClass, ?int $entityId = null, ?int $page = null): void
-    {
-        $this->checkEntityIdAndPage($entityId, $page);
-        $criteria = $this->buildCriteria($userId, $entityClass, $entityId, $page);
-        $ressources = $this->repository->findBy($criteria);
-
-        foreach ($ressources as $ressource) {
-            $this->entityManager->remove($ressource);
-        }
-
-        $this->entityManager->flush();
     }
 
     /**
@@ -95,22 +63,19 @@ class RessourceCache
     }
 
     /**
-     * Build criteria for repository.
+     * Create a key from user id, entity class name, entity id or page number.
      */
-    private function buildCriteria(int $userId, string $entityClass, ?int $entityId = null, ?int $page = null): array
+    public function createKey(int $userId, string $entityClass, ?int $entityId = null, ?int $page = null): string
     {
-        $criteria = [];
-        $criteria['entityClass'] = $entityClass;
-        $criteria['userId'] = $userId;
+        $this->checkEntityIdAndPage($entityId, $page);
 
-        if (null !== $entityId) {
-            $criteria['entityId'] = $entityId;
-        }
+        // remove the FQCN of entity class name
+        $className = substr($entityClass, strrpos($entityClass, '\\') + 1);
 
         if (null !== $page) {
-            $criteria['page'] = $page;
+            return sprintf('user%d_%s_index_page%d', $userId, $className, $page);
         }
 
-        return $criteria;
+        return sprintf('user%d_%s%d', $userId, $className, $entityId);
     }
 }
