@@ -64,6 +64,8 @@ class RessourceCache
 
     /**
      * Create a key from user id, entity class name, entity id or page number.
+     * The user id is need to have unique customer index key.
+     * Otherwise 2 users could have the same ressource for customer_index_page1.
      */
     public function createKey(int $userId, string $entityClass, ?int $entityId = null, ?int $page = null): string
     {

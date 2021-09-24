@@ -63,7 +63,7 @@ class HalRessourceMaker
 
         $ressource = (new HalRessource())
             ->setId($ressource->getId())
-            ->settype($this->getClassName($ressource))
+            ->settype($this->getEntityName($ressource))
             ->setRessource($ressource)
             ->setLinks($this->linkMaker->makeLinks($ressource))
         ;
@@ -73,6 +73,7 @@ class HalRessourceMaker
 
     /**
      * Create HalRessource object from a given ressource object.
+     * Used for paginated items.
      */
     private function makeLightRessource(object $ressource): HalRessource
     {
@@ -82,22 +83,17 @@ class HalRessourceMaker
 
         return (new HalRessource())
             ->setId($ressource->getId())
-            ->settype($this->getClassName($ressource))
+            ->settype($this->getEntityName($ressource))
             ->setRessource($ressource)
             ->setLinks($this->linkMaker->makeSelfLink($ressource))
         ;
     }
 
     /**
-     * Return only the class name: the FQCN without the namespaces.
+     * Return only the class name of the entity: the FQCN without the namespaces.
      */
-    private function getClassName(object $ressource): string
+    private function getEntityName(object $ressource): string
     {
-        // $fqcn = get_class($ressource);
-
-        // // remove the namespaces
-        // return substr($fqcn, strrpos($fqcn, '\\') + 1);
-
         return self::TYPES[get_class($ressource)];
     }
 }

@@ -5,7 +5,7 @@ namespace App\EventSubscriber;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ExceptionSubscriber implements EventSubscriberInterface
+class FormatSubscriber implements EventSubscriberInterface
 {
     public function onKernelRequest(RequestEvent $event): void
     {
