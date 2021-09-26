@@ -106,8 +106,6 @@ class CustomerController extends AppAbstractController
      *         ref=@Model(type=ReadCustomer::class)
      *     )
      * )
-     * @OA\Response(response=403, description="Access denied.")
-     * @OA\Response(response=404, description="Customer not found.")
      * @OA\Response(response=422, description="Return error message for each field")
      * @OA\RequestBody(@OA\JsonContent(
      *       ref=@Model(type=CreateCustomer::class)

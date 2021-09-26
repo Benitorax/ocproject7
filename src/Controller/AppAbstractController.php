@@ -51,7 +51,14 @@ class AppAbstractController extends AbstractController
 
         foreach ($form->getErrors() as $error) {
             /** @var FormError $error */
-            $errors[] = $error->getMessage();
+            $message = $error->getMessage();
+
+            if (array_key_exists('{{ extra_fields }}', $error->getMessageParameters())) {
+                $message = substr($message, 0, -1);
+                $message .= ': ' . $error->getMessageParameters()['{{ extra_fields }}'] . '.';
+            }
+
+            $errors[] = $message;
         }
 
         foreach ($form->all() as $childForm) {
