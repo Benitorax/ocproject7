@@ -33,10 +33,9 @@ class PhoneController extends AppAbstractController
     public function index(Request $request, PhoneManager $manager): Response
     {
         $page = (int) $request->query->get('page') ?: 1;
-
         $etag = $manager->getPhonesEtag($page);
 
-        if ($this->isResponseNotModified($etag, $request)) {
+        if (null !== $etag && $this->isResponseNotModified($etag, $request)) {
             $cachePhones = $manager->getCachePaginatedPhones($page);
             return $this->jsonResponseWithEtag($cachePhones, $etag);
         }

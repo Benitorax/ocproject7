@@ -14,6 +14,16 @@ use App\DTO\Phone\ReadLightPhoneDataTransformer;
 
 class PhoneManager
 {
+    public const PAGINATION_LINKS = [
+        'list' => ['api_phone_index', [], 'GET'],
+        'self' => ['api_phone_show', ['id'], 'GET'],
+    ];
+
+    public const RESSOURCE_LINKS = [
+        'self' => ['api_phone_show', ['id'], 'GET'],
+        'list' => ['api_phone_index', [], 'GET'],
+    ];
+
     private PhoneRepository $repository;
     private HalRessourceMaker $halMaker;
     private RessourceCache $cache;
@@ -40,24 +50,21 @@ class PhoneManager
     /**
      * Get etag of several phones.
      */
-    public function getPhonesEtag(int $page): string
+    public function getPhonesEtag(int $page): ?string
     {
         $paginator = $this->paginator->paginate(
             $this->repository->findAllTricksQuery(),
             $page,
             4
         );
+        $items = $paginator->getItems();
+        $etag = null;
 
-        // prevDatetime will be the most recent date
-        $prevDatetime = null;
-        foreach ($paginator->getItems() as $phone) {
-            $nextDatetime = $phone->getUpdatedAt();
-            if ($nextDatetime > $prevDatetime) {
-                $prevDatetime = $nextDatetime;
-            }
+        if (count($items) > 0) {
+            $etag = md5(serialize($items));
         }
 
-        return md5($prevDatetime->format('Y-m-d H:i:s'));
+        return $etag;
     }
 
     /**
@@ -80,7 +87,7 @@ class PhoneManager
             new ReadLightPhoneDataTransformer()
         );
 
-        $phones = $this->halMaker->makePaginatorRessource($paginator);
+        $phones = $this->halMaker->makePaginatorRessource($paginator, self::PAGINATION_LINKS);
         $this->cache->cache($this->user->getId(), Phone::class, null, $page, $phones);
 
         return $phones;
@@ -110,6 +117,6 @@ class PhoneManager
      */
     private function convertToHalRessource(Phone $phone): string
     {
-        return $this->halMaker->makeRessource(ReadPhone::createFromPhone($phone));
+        return $this->halMaker->makeRessource(ReadPhone::createFromPhone($phone), self::RESSOURCE_LINKS);
     }
 }

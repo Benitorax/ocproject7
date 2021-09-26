@@ -22,7 +22,7 @@ class AppAbstractController extends AbstractController
     /**
      * Return a JsonResponse object with Etag
      */
-    public function jsonResponseWithEtag(string $content, string $etag): JsonResponse
+    public function jsonResponseWithEtag(string $content, ?string $etag): JsonResponse
     {
         return (new JsonResponse($content, 200, [], true))
             ->setEtag($etag)

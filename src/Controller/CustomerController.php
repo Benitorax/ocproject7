@@ -43,7 +43,7 @@ class CustomerController extends AppAbstractController
         $page = (int) $request->query->get('page') ?: 1;
         $etag = $manager->getCustomersEtag($page);
 
-        if ($this->isResponseNotModified($etag, $request)) {
+        if (null !== $etag && $this->isResponseNotModified($etag, $request)) {
             $cacheCustomers = $manager->getCachePaginatedCustomers($page);
             return $this->jsonResponseWithEtag($cacheCustomers, $etag);
         }

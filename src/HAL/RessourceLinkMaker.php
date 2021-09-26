@@ -2,40 +2,13 @@
 
 namespace App\HAL;
 
+use App\DTO\DTOInterface;
 use App\HAL\Link;
 use App\Service\Paginator;
-use App\DTO\Phone\ReadPhone;
-use App\DTO\Phone\ReadLightPhone;
-use App\DTO\Customer\ReadCustomer;
-use App\DTO\Customer\ReadLightCustomer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class RessourceLinkMaker
 {
-    public const PAGINATION_RESSOURCES = [
-        ReadLightCustomer::class => [
-           'list' => ['api_customer_index', [], 'GET'],
-           'self' => ['api_customer_show', ['id'], 'GET'],
-        ],
-        ReadLightPhone::class => [
-           'list' => ['api_phone_index', [], 'GET'],
-           'self' => ['api_phone_show', ['id'], 'GET'],
-        ],
-    ];
-
-    public const RESSOURCES = [
-        ReadCustomer::class => [
-            'self' => ['api_customer_show', ['id'], 'GET'],
-            'list' => ['api_customer_index', [], 'GET'],
-            'create' => ['api_customer_create', [], 'POST'],
-            'delete' => ['api_customer_delete', ['id'], 'DELETE'],
-        ],
-        ReadPhone::class => [
-            'self' => ['api_phone_show', ['id'], 'GET'],
-            'list' => ['api_phone_index', [], 'GET'],
-        ],
-    ];
-
     private UrlGeneratorInterface $router;
 
     public function __construct(UrlGeneratorInterface $router)
@@ -48,11 +21,9 @@ class RessourceLinkMaker
      *
      * @return Link[]
      */
-    public function makePaginationLinks(Paginator $paginator)
+    public function makePaginationLinks(Paginator $paginator, string $routeName)
     {
-        $ressource = $paginator->getItems()[0];
-        $data = self::PAGINATION_RESSOURCES[get_class($ressource)]['list'];
-        $url = $this->generateUrl($data[0]);
+        $url = $this->generateUrl($routeName);
         $page = $paginator->getPage();
         $pagesTotal = $paginator->getPagesTotal();
 
@@ -78,15 +49,10 @@ class RessourceLinkMaker
      *
      * @return Link[]
      */
-    public function makeLinks(object $ressource)
+    public function makeLinks(DTOInterface $ressource, array $linksToCreate)
     {
-        if (!method_exists($ressource, 'getId')) {
-            throw new \Exception('Ressource object must define getId method to generate id for HAL ressource.');
-        }
-
-        $ressources = self::RESSOURCES[get_class($ressource)];
         $links = [];
-        foreach ($ressources as $name => $data) {
+        foreach ($linksToCreate as $name => $data) {
             $links[$name] = $this->makeLink($data, $ressource->getId());
         }
 
@@ -98,14 +64,9 @@ class RessourceLinkMaker
      *
      * @return Link[]
      */
-    public function makeSelfLink(object $ressource)
+    public function makeSelfLink(DTOInterface $ressource, array $selfLinkToCreate)
     {
-        if (!method_exists($ressource, 'getId')) {
-            throw new \Exception('Ressource object must define getId method to generate id for HAL ressource.');
-        }
-
-        $data = self::PAGINATION_RESSOURCES[get_class($ressource)]['self'];
-        return ['self' => $this->makeLink($data, $ressource->getId())];
+        return ['self' => $this->makeLink($selfLinkToCreate, $ressource->getId())];
     }
 
     /**

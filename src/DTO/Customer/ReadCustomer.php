@@ -6,11 +6,12 @@ use App\Entity\Customer;
 use OpenApi\Annotations as OA;
 use App\DTO\Address\Address;
 use App\DTO\ContactDetailsTrait;
+use App\DTO\DTOInterface;
 
 /**
  * @OA\Schema
  */
-class ReadCustomer
+class ReadCustomer implements DTOInterface
 {
     use ContactDetailsTrait;
 
@@ -49,7 +50,7 @@ class ReadCustomer
 
     private Address $address;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -120,5 +121,13 @@ class ReadCustomer
             ->setPhoneNumber($customer->getPhoneNumber())
             ->setEmail($customer->getEmail())
         ;
+    }
+
+    /**
+     * Return the entity name of the DTO.
+     */
+    public function getEntityName(): string
+    {
+        return 'Customer';
     }
 }

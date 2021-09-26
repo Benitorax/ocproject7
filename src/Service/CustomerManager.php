@@ -16,6 +16,18 @@ use App\DTO\Customer\ReadLightCustomerDataTransformer;
 
 class CustomerManager
 {
+    public const PAGINATION_LINKS = [
+        'list' => ['api_customer_index', [], 'GET'],
+        'self' => ['api_customer_show', ['id'], 'GET'],
+    ];
+
+    public const RESSOURCE_LINKS = [
+        'self' => ['api_customer_show', ['id'], 'GET'],
+        'list' => ['api_customer_index', [], 'GET'],
+        'create' => ['api_customer_create', [], 'POST'],
+        'delete' => ['api_customer_delete', ['id'], 'DELETE'],
+    ];
+
     private CustomerRepository $repository;
     private RessourceCache $cache;
     private EntityManagerInterface $entityManager;
@@ -45,24 +57,21 @@ class CustomerManager
     /**
      * Get etag of several phones.
      */
-    public function getCustomersEtag(int $page): string
+    public function getCustomersEtag(int $page): ?string
     {
         $paginator = $this->paginator->paginate(
             $this->repository->findAllCustomersByUserQuery($this->user),
             $page,
             4
         );
+        $items = $paginator->getItems();
+        $etag = null;
 
-        // prevDatetime will be the most recent date
-        $prevDatetime = null;
-        foreach ($paginator->getItems() as $phone) {
-            $nextDatetime = $phone->getUpdatedAt();
-            if ($nextDatetime > $prevDatetime) {
-                $prevDatetime = $nextDatetime;
-            }
+        if (count($items) > 0) {
+            $etag = md5(serialize($items));
         }
 
-        return md5($prevDatetime->format('Y-m-d H:i:s'));
+        return $etag;
     }
 
     /**
@@ -85,7 +94,7 @@ class CustomerManager
             new ReadLightCustomerDataTransformer()
         );
 
-        $halCustomers = $this->halMaker->makePaginatorRessource($paginator);
+        $halCustomers = $this->halMaker->makePaginatorRessource($paginator, self::PAGINATION_LINKS);
         $this->cache->cache($this->user->getId(), Customer::class, null, $page, $halCustomers);
 
         return $halCustomers;
@@ -142,6 +151,6 @@ class CustomerManager
      */
     private function convertToHalRessource(Customer $customer): string
     {
-        return $this->halMaker->makeRessource(ReadCustomer::createFromCustomer($customer));
+        return $this->halMaker->makeRessource(ReadCustomer::createFromCustomer($customer), self::RESSOURCE_LINKS);
     }
 }
