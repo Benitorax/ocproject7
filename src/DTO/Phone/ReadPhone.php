@@ -167,7 +167,7 @@ class ReadPhone implements DTOInterface
     /**
      * Return the entity name of the DTO.
      */
-    public function getEntityName(): string
+    public function entityName(): string
     {
         return 'Phone';
     }

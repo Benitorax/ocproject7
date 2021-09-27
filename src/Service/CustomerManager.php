@@ -137,8 +137,10 @@ class CustomerManager
      */
     public function delete(Customer $customer): string
     {
+        $linksToCreate = self::RESSOURCE_LINKS;
+        unset($linksToCreate['self'], $linksToCreate['delete']);
         // execute the line below before flush because "id" won't be initialized anymore
-        $readCustomer = $this->convertToHalRessource($customer);
+        $readCustomer = $this->convertToHalRessource($customer, $linksToCreate);
 
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
@@ -149,8 +151,10 @@ class CustomerManager
     /**
      * Convert a Customer to Customer HalRessource.
      */
-    private function convertToHalRessource(Customer $customer): string
+    private function convertToHalRessource(Customer $customer, array $linksToCreate = null): string
     {
-        return $this->halMaker->makeRessource(ReadCustomer::createFromCustomer($customer), self::RESSOURCE_LINKS);
+        $linksToCreate = $linksToCreate ? $linksToCreate : self::RESSOURCE_LINKS;
+
+        return $this->halMaker->makeRessource(ReadCustomer::createFromCustomer($customer), $linksToCreate);
     }
 }

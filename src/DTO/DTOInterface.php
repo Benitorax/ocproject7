@@ -12,5 +12,5 @@ interface DTOInterface
     /**
      * Return the entity name of the ressource
      */
-    public function getEntityName(): string;
+    public function entityName(): string;
 }

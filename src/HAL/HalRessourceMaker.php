@@ -64,7 +64,7 @@ class HalRessourceMaker
     {
         $ressource = (new HalRessource())
             ->setId($ressource->getId())
-            ->settype($ressource->getEntityName())
+            ->settype($ressource->entityName())
             ->setRessource($ressource)
             ->setLinks($this->linkMaker->makeLinks($ressource, $linksToCreate))
         ;
@@ -83,7 +83,7 @@ class HalRessourceMaker
     {
         return (new HalRessource())
             ->setId($ressource->getId())
-            ->settype($ressource->getEntityName())
+            ->settype($ressource->entityName())
             ->setRessource($ressource)
             ->setLinks($this->linkMaker->makeSelfLink($ressource, $linksToCreate))
         ;
