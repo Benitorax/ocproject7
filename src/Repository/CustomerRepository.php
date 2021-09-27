@@ -65,21 +65,4 @@ class CustomerRepository extends ServiceEntityRepository
             ->getQuery()
         ;
     }
-
-    /**
-     * Return a Customer object for a given Id and User.
-     */
-    public function findOneByIdAndUser(int $id, User $user): ?Customer
-    {
-        return $this->createQueryBuilder('c')
-            ->leftJoin('c.address', 'a')
-            ->addSelect('a')
-            ->andWhere('c.id = :id')
-            ->setParameter('id', $id)
-            ->andWhere('c.user = :user')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
 }

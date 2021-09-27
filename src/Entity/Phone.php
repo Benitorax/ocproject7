@@ -12,14 +12,8 @@ use Nelmio\ApiDocBundle\Annotation\Model;
  */
 class Phone
 {
+    use IdentifierTrait;
     use TimestampTrait;
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private int $id;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -55,11 +49,6 @@ class Phone
     {
         $this->createdAt = new \DateTimeImmutable('now');
         $this->updatedAt = new \DateTimeImmutable('now');
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     public function getBrand(): string

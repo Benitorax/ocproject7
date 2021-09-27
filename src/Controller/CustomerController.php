@@ -30,13 +30,13 @@ class CustomerController extends AppAbstractController
      *
      * @OA\Response(
      *     response=200,
-     *     description="Returns a paginated list of customer",
+     *     description="Returns a paginated list of customers",
      *     @OA\JsonContent(@OA\Schema(
      *       type="array",
      *       @OA\Items(ref=@Model(type=ReadCustomer::class))
      *     ))
      * )
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function index(Request $request, CustomerManager $manager): Response
     {
@@ -72,7 +72,7 @@ class CustomerController extends AppAbstractController
      * @OA\Response(response=403, description="Access denied.")
      * @OA\Response(response=404, description="Customer not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function show(Customer $customer, CustomerManager $manager, Request $request): Response
     {
@@ -110,7 +110,7 @@ class CustomerController extends AppAbstractController
      * @OA\RequestBody(@OA\JsonContent(
      *       ref=@Model(type=CreateCustomer::class)
      * ))
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function create(Request $request, CustomerManager $manager): Response
     {
@@ -146,7 +146,7 @@ class CustomerController extends AppAbstractController
      * @OA\Response(response=403, description="Access denied.")
      * @OA\Response(response=404, description="Customer not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function delete(Customer $customer, CustomerManager $manager): Response
     {

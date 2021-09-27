@@ -18,14 +18,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use ContactDetailsTrait;
+    use IdentifierTrait;
     use TimestampTrait;
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private int $id;
 
     /**
      * @ORM\Column(type="string", length=150)
@@ -75,11 +69,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->customers = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable('now');
         $this->updatedAt = new \DateTimeImmutable('now');
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string

@@ -13,14 +13,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Customer
 {
     use ContactDetailsTrait;
+    use IdentifierTrait;
     use TimestampTrait;
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private int $id;
 
     /**
      * @Assert\Choice({"Mr.", "Ms.", "Miss"})
@@ -67,11 +61,6 @@ class Customer
     {
         $this->createdAt = new \DateTimeImmutable('now');
         $this->updatedAt = new \DateTimeImmutable('now');
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     public function getGender(): string

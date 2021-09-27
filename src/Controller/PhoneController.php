@@ -28,7 +28,7 @@ class PhoneController extends AppAbstractController
      *       @OA\Items(ref=@Model(type=ReadPhone::class))
      *     ))
      * )
-     * @OA\Tag(name="phones")
+     * @OA\Tag(name="Phones")
      */
     public function index(Request $request, PhoneManager $manager): Response
     {
@@ -59,7 +59,7 @@ class PhoneController extends AppAbstractController
      * )
      * @OA\Response(response=404, description="Phone not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
-     * @OA\Tag(name="phones")
+     * @OA\Tag(name="Phones")
      */
     public function show(Phone $phone, PhoneManager $manager, Request $request): Response
     {
