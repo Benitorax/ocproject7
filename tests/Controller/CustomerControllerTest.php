@@ -34,7 +34,6 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertHasKey('total');
         $this->assertHasKey('embedded');
         $this->assertKeyHasKey('links', 'self');
-        $this->assertKeyHasKey('links', 'first');
         $this->assertKeyHasKey('links', 'next');
         $this->assertKeyHasKey('links', 'last');
     }

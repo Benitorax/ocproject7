@@ -29,7 +29,10 @@ class RessourceLinkMaker
 
         $links = [];
         $links['self'] = $this->makePaginationLink($url . '?page=' . $page);
-        $links['first'] = $this->makePaginationLink($url);
+
+        if ($page !== 1) {
+            $links['first'] = $this->makePaginationLink($url . '?page=1');
+        }
 
         if ($page > 1) {
             $links['prev'] = $this->makePaginationLink($url . '?page=' . ($page - 1));
@@ -39,7 +42,9 @@ class RessourceLinkMaker
             $links['next'] = $this->makePaginationLink($url . '?page=' . ($page + 1));
         }
 
-        $links['last'] = $this->makePaginationLink($url . '?page=' . $pagesTotal);
+        if ($page < $pagesTotal) {
+            $links['last'] = $this->makePaginationLink($url . '?page=' . $pagesTotal);
+        }
 
         return $links;
     }
