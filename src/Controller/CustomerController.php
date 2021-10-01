@@ -137,11 +137,8 @@ class CustomerController extends AppAbstractController
      * )
      *
      * @OA\Response(
-     *     response=200,
-     *     description="Return the deleted customer",
-     *     @OA\JsonContent(
-     *       ref=@Model(type=ReadCustomer::class)
-     *     )
+     *     response=204,
+     *     description="Delete the customer",
      * )
      * @OA\Response(response=403, description="Access denied.")
      * @OA\Response(response=404, description="Customer not found.")
@@ -151,8 +148,8 @@ class CustomerController extends AppAbstractController
     public function delete(Customer $customer, CustomerManager $manager): Response
     {
         $this->denyAccessUnlessGranted(CustomerVoter::DELETE, $customer);
-        $customer = $manager->delete($customer);
+        $manager->delete($customer);
 
-        return new JsonResponse($customer, 200, [], true);
+        return new JsonResponse(null, 204, [], false);
     }
 }

@@ -139,11 +139,6 @@ class CustomerControllerTest extends AppWebTestCase
         $client->jsonRequest('DELETE', '/api/customers/' . $phoneId, [], [
             'HTTP_Authorization' => 'Bearer ' . $this->getUserJWT()
         ]);
-        $this->assertResponseStatusCodeSame(200);
-        $this->assertKeyContains('id', $phoneId);
-        $this->assertKeyContains('type', 'Customer');
-        $this->assertHasKey('ressource');
-        $this->assertKeyHasKey('links', 'create');
-        $this->assertKeyHasKey('links', 'list');
+        $this->assertResponseStatusCodeSame(204);
     }
 }
