@@ -35,11 +35,7 @@ class AppAbstractController extends AbstractController
      */
     public function getEntityEtag(object $entity): string
     {
-        if (!method_exists($entity, 'getUpdatedAt')) {
-            throw new \Exception('Your entity must define getUpdatedAt method to generate entity etag.');
-        }
-
-        return md5($entity->getUpdatedAt()->format('Y-m-d H:i:s'));
+        return md5(serialize($entity));
     }
 
     /**

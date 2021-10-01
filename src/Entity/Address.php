@@ -22,7 +22,7 @@ class Address
      * )
      * @ORM\Column(type="string", length=255)
      */
-    private string $address;
+    private string $address = '';
 
     /**
      * @Assert\Length(
@@ -33,7 +33,7 @@ class Address
      * )
      * @ORM\Column(type="string", length=100)
      */
-    private string $city;
+    private string $city = '';
 
     /**
      * @Assert\Length(
@@ -44,7 +44,7 @@ class Address
      * )
      * @ORM\Column(type="string", length=10)
      */
-    private string $zipCode;
+    private string $zipCode = '';
 
     public function getAddress(): string
     {
