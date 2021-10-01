@@ -46,7 +46,7 @@ class Customer
 
     /**
      * @Assert\Valid
-     * @ORM\OneToOne(targetEntity=Address::class, cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Address::class, cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      */
     private Address $address;
