@@ -106,7 +106,7 @@ class CustomerControllerTest extends AppWebTestCase
         ], [
             'HTTP_Authorization' => 'Bearer ' . $this->getUserJWT()
         ]);
-        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseStatusCodeSame(201);
         $this->assertKeyContains('type', 'Customer');
         $this->assertHasKey('ressource');
         $this->assertKeyHasKey('links', 'self');

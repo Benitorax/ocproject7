@@ -100,7 +100,7 @@ class CustomerController extends AppAbstractController
      * )
      *
      * @OA\Response(
-     *     response=200,
+     *     response=201,
      *     description="Return the created customer",
      *     @OA\JsonContent(
      *         ref=@Model(type=ReadCustomer::class)
@@ -121,7 +121,7 @@ class CustomerController extends AppAbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $customer = $manager->addNewCustomer($form->getData());
 
-            return new JsonResponse($customer, 200, [], true);
+            return new JsonResponse($customer, 201, [], true);
         }
 
         return $this->json($this->getErrorsFromForm($form), 422);
