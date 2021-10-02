@@ -22,7 +22,7 @@ class AppAbstractController extends AbstractController
     /**
      * Return a JsonResponse object with Etag
      */
-    public function jsonResponseWithEtag(string $content, string $etag): JsonResponse
+    public function jsonResponseWithEtag(string $content, ?string $etag): JsonResponse
     {
         return (new JsonResponse($content, 200, [], true))
             ->setEtag($etag)
@@ -35,11 +35,7 @@ class AppAbstractController extends AbstractController
      */
     public function getEntityEtag(object $entity): string
     {
-        if (!method_exists($entity, 'getUpdatedAt')) {
-            throw new \Exception('Your entity must define getUpdatedAt method to generate entity etag.');
-        }
-
-        return md5($entity->getUpdatedAt()->format('Y-m-d H:i:s'));
+        return md5(serialize($entity));
     }
 
     /**
@@ -51,7 +47,14 @@ class AppAbstractController extends AbstractController
 
         foreach ($form->getErrors() as $error) {
             /** @var FormError $error */
-            $errors[] = $error->getMessage();
+            $message = $error->getMessage();
+
+            if (array_key_exists('{{ extra_fields }}', $error->getMessageParameters())) {
+                $message = substr($message, 0, -1);
+                $message .= ': ' . $error->getMessageParameters()['{{ extra_fields }}'] . '.';
+            }
+
+            $errors[] = $message;
         }
 
         foreach ($form->all() as $childForm) {

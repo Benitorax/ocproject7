@@ -2,24 +2,15 @@
 
 namespace App\HAL;
 
+use App\DTO\DTOInterface;
 use App\HAL\HalPaginator;
 use App\HAL\HalRessource;
 use App\Service\Paginator;
-use App\DTO\Phone\ReadPhone;
 use App\HAL\RessourceLinkMaker;
-use App\DTO\Phone\ReadLightPhone;
-use App\DTO\Customer\ReadCustomer;
-use App\DTO\Customer\ReadLightCustomer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class HalRessourceMaker
 {
-    public const TYPES = [
-        ReadLightCustomer::class => 'Customer',
-        ReadCustomer::class => 'Customer',
-        ReadLightPhone::class => 'Phone',
-        ReadPhone::class => 'Phone',
-    ];
     private RessourceLinkMaker $linkMaker;
     private SerializerInterface $serializer;
 
@@ -33,20 +24,26 @@ class HalRessourceMaker
 
     /**
      * Create HalPaginator object from a Paginator object.
+     *
+     * Paramater $linksToCreate should have this kind of format:
+     * [
+     *     'list' => ['api_phone_index', [], 'GET'],
+     *     'self' => ['api_phone_show', ['id'], 'GET'],
+     * ]
      */
-    public function makePaginatorRessource(Paginator $paginator): string
+    public function makePaginatorRessource(Paginator $paginator, array $linksToCreate): string
     {
         // transform items to HalRessource objects
         $items = [];
         foreach ($paginator->getItems() as $item) {
-            $items[] = $this->makeLightRessource($item);
+            $items[] = $this->makeLightRessource($item, $linksToCreate['self']);
         }
 
         $paginator = (new HalPaginator())
             ->setCount($paginator->count())
             ->setTotal($paginator->getItemsTotal())
             ->setEmbedded($items)
-            ->setLinks($this->linkMaker->makePaginationLinks($paginator))
+            ->setLinks($this->linkMaker->makePaginationLinks($paginator, $linksToCreate['list'][0]))
         ;
 
         return $this->serializer->serialize($paginator, 'json');
@@ -54,18 +51,22 @@ class HalRessourceMaker
 
     /**
      * Create HalRessource object from a given ressource object.
+     *
+     * Paramater $linksToCreate should have this kind of format:
+     * [
+     *     'self' => ['api_customer_show', ['id'], 'GET'],
+     *     'list' => ['api_customer_index', [], 'GET'],
+     *     'create' => ['api_customer_create', [], 'POST'],
+     *     'delete' => ['api_customer_delete', ['id'], 'DELETE'],
+     * ]
      */
-    public function makeRessource(object $ressource): string
+    public function makeRessource(DTOInterface $ressource, array $linksToCreate): string
     {
-        if (!method_exists($ressource, 'getId')) {
-            throw new \Exception('Ressource object must define getId method to generate id for HAL ressource.');
-        }
-
         $ressource = (new HalRessource())
             ->setId($ressource->getId())
-            ->settype($this->getClassName($ressource))
+            ->settype($ressource->entityName())
             ->setRessource($ressource)
-            ->setLinks($this->linkMaker->makeLinks($ressource))
+            ->setLinks($this->linkMaker->makeLinks($ressource, $linksToCreate))
         ;
 
         return $this->serializer->serialize($ressource, 'json');
@@ -73,31 +74,18 @@ class HalRessourceMaker
 
     /**
      * Create HalRessource object from a given ressource object.
+     * Used for paginated items.
+     *
+     * Paramater $linksToCreate should have this kind of format:
+     * ['api_phone_show', ['id'], 'GET']
      */
-    private function makeLightRessource(object $ressource): HalRessource
+    private function makeLightRessource(DTOInterface $ressource, array $linksToCreate): HalRessource
     {
-        if (!method_exists($ressource, 'getId')) {
-            throw new \Exception('Ressource object must define getId method to generate id for HAL ressource.');
-        }
-
         return (new HalRessource())
             ->setId($ressource->getId())
-            ->settype($this->getClassName($ressource))
+            ->settype($ressource->entityName())
             ->setRessource($ressource)
-            ->setLinks($this->linkMaker->makeSelfLink($ressource))
+            ->setLinks($this->linkMaker->makeSelfLink($ressource, $linksToCreate))
         ;
-    }
-
-    /**
-     * Return only the class name: the FQCN without the namespaces.
-     */
-    private function getClassName(object $ressource): string
-    {
-        // $fqcn = get_class($ressource);
-
-        // // remove the namespaces
-        // return substr($fqcn, strrpos($fqcn, '\\') + 1);
-
-        return self::TYPES[get_class($ressource)];
     }
 }

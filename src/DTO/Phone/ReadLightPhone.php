@@ -2,13 +2,14 @@
 
 namespace App\DTO\Phone;
 
+use App\DTO\DTOInterface;
 use App\Entity\Phone;
 use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema
  */
-class ReadLightPhone
+class ReadLightPhone implements DTOInterface
 {
     /**
      * @OA\Property(
@@ -77,5 +78,13 @@ class ReadLightPhone
             ->setBrand($phone->getBrand())
             ->setModel($phone->getModel())
         ;
+    }
+
+    /**
+     * Return the entity name of the DTO.
+     */
+    public function entityName(): string
+    {
+        return 'Phone';
     }
 }

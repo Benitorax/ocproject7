@@ -4,12 +4,12 @@ namespace App\DTO\Customer;
 
 use App\Entity\Customer;
 use OpenApi\Annotations as OA;
-use App\DTO\Address\Address;
+use App\DTO\DTOInterface;
 
 /**
  * @OA\Schema
  */
-class ReadLightCustomer
+class ReadLightCustomer implements DTOInterface
 {
     /**
      * @OA\Property(
@@ -44,7 +44,7 @@ class ReadLightCustomer
      */
     private string $lastName;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -100,5 +100,13 @@ class ReadLightCustomer
             ->setFirstName($customer->getFirstName())
             ->setLastName($customer->getLastName())
         ;
+    }
+
+    /**
+     * Return the entity name of the DTO.
+     */
+    public function entityName(): string
+    {
+        return 'Customer';
     }
 }

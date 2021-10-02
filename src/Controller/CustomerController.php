@@ -30,21 +30,20 @@ class CustomerController extends AppAbstractController
      *
      * @OA\Response(
      *     response=200,
-     *     description="Returns a paginated list of customer",
+     *     description="Returns a paginated list of customers",
      *     @OA\JsonContent(@OA\Schema(
      *       type="array",
      *       @OA\Items(ref=@Model(type=ReadCustomer::class))
      *     ))
      * )
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function index(Request $request, CustomerManager $manager): Response
     {
         $page = (int) $request->query->get('page') ?: 1;
-
         $etag = $manager->getCustomersEtag($page);
 
-        if ($this->isResponseNotModified($etag, $request)) {
+        if (null !== $etag && $this->isResponseNotModified($etag, $request)) {
             $cacheCustomers = $manager->getCachePaginatedCustomers($page);
             return $this->jsonResponseWithEtag($cacheCustomers, $etag);
         }
@@ -73,7 +72,7 @@ class CustomerController extends AppAbstractController
      * @OA\Response(response=403, description="Access denied.")
      * @OA\Response(response=404, description="Customer not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function show(Customer $customer, CustomerManager $manager, Request $request): Response
     {
@@ -101,19 +100,17 @@ class CustomerController extends AppAbstractController
      * )
      *
      * @OA\Response(
-     *     response=200,
+     *     response=201,
      *     description="Return the created customer",
      *     @OA\JsonContent(
      *         ref=@Model(type=ReadCustomer::class)
      *     )
      * )
-     * @OA\Response(response=403, description="Access denied.")
-     * @OA\Response(response=404, description="Customer not found.")
      * @OA\Response(response=422, description="Return error message for each field")
      * @OA\RequestBody(@OA\JsonContent(
      *       ref=@Model(type=CreateCustomer::class)
      * ))
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function create(Request $request, CustomerManager $manager): Response
     {
@@ -124,7 +121,7 @@ class CustomerController extends AppAbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $customer = $manager->addNewCustomer($form->getData());
 
-            return $this->json($customer);
+            return new JsonResponse($customer, 201, [], true);
         }
 
         return $this->json($this->getErrorsFromForm($form), 422);
@@ -140,22 +137,19 @@ class CustomerController extends AppAbstractController
      * )
      *
      * @OA\Response(
-     *     response=200,
-     *     description="Return the deleted customer",
-     *     @OA\JsonContent(
-     *       ref=@Model(type=ReadCustomer::class)
-     *     )
+     *     response=204,
+     *     description="Delete the customer",
      * )
      * @OA\Response(response=403, description="Access denied.")
      * @OA\Response(response=404, description="Customer not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
-     * @OA\Tag(name="customers")
+     * @OA\Tag(name="Customers")
      */
     public function delete(Customer $customer, CustomerManager $manager): Response
     {
         $this->denyAccessUnlessGranted(CustomerVoter::DELETE, $customer);
-        $customer = $manager->delete($customer);
+        $manager->delete($customer);
 
-        return $this->json($customer);
+        return new JsonResponse(null, 204, [], false);
     }
 }

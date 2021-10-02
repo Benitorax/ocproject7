@@ -6,7 +6,7 @@ use App\Tests\Controller\AppWebTestCase;
 
 class CustomerControllerTest extends AppWebTestCase
 {
-    public function testPhonesIndexInvalidJWT(): void
+    public function testCustomersIndexInvalidJWT(): void
     {
         $client = $this->client();
 
@@ -23,7 +23,7 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertKeyContains('message', 'Invalid JWT Token');
     }
 
-    public function testPhonesIndex(): void
+    public function testCustomersIndex(): void
     {
         $client = $this->client();
         $client->jsonRequest('GET', '/api/customers', [], [
@@ -34,12 +34,11 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertHasKey('total');
         $this->assertHasKey('embedded');
         $this->assertKeyHasKey('links', 'self');
-        $this->assertKeyHasKey('links', 'first');
         $this->assertKeyHasKey('links', 'next');
         $this->assertKeyHasKey('links', 'last');
     }
 
-    public function textPhonesShowInvalidJWT(): void
+    public function testCustomerShowInvalidJWT(): void
     {
         $client = $this->client();
         $phoneId = $this->getCustomer()->getId();
@@ -57,7 +56,7 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertKeyContains('message', 'Invalid JWT Token');
     }
 
-    public function testPhonesShow(): void
+    public function testCustomerShow(): void
     {
         $client = $this->client();
         $phoneId = $this->getCustomer()->getId();
@@ -73,7 +72,7 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertKeyHasKey('links', 'list');
     }
 
-    public function testPhonesAddInvalidJWT(): void
+    public function testCustomerAddInvalidJWT(): void
     {
         $client = $this->client();
 
@@ -90,7 +89,7 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertKeyContains('message', 'Invalid JWT Token');
     }
 
-    public function testPhonesAdd(): void
+    public function testCustomersAdd(): void
     {
         $client = $this->client();
         $client->jsonRequest('POST', '/api/customers', [
@@ -107,14 +106,14 @@ class CustomerControllerTest extends AppWebTestCase
         ], [
             'HTTP_Authorization' => 'Bearer ' . $this->getUserJWT()
         ]);
-        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseStatusCodeSame(201);
         $this->assertKeyContains('type', 'Customer');
         $this->assertHasKey('ressource');
         $this->assertKeyHasKey('links', 'self');
         $this->assertKeyHasKey('links', 'list');
     }
 
-    public function testPhonesDeleteInvalidJWT(): void
+    public function testCustomerDeleteInvalidJWT(): void
     {
         $client = $this->client();
         $phoneId = $this->getCustomer()->getId();
@@ -132,7 +131,7 @@ class CustomerControllerTest extends AppWebTestCase
         $this->assertKeyContains('message', 'Invalid JWT Token');
     }
 
-    public function testPhonesDelete(): void
+    public function testCustomerDelete(): void
     {
         $client = $this->client();
         $phoneId = $this->getCustomer()->getId();
@@ -140,11 +139,6 @@ class CustomerControllerTest extends AppWebTestCase
         $client->jsonRequest('DELETE', '/api/customers/' . $phoneId, [], [
             'HTTP_Authorization' => 'Bearer ' . $this->getUserJWT()
         ]);
-        $this->assertResponseStatusCodeSame(200);
-        $this->assertKeyContains('id', $phoneId);
-        $this->assertKeyContains('type', 'Customer');
-        $this->assertHasKey('ressource');
-        $this->assertKeyHasKey('links', 'self');
-        $this->assertKeyHasKey('links', 'list');
+        $this->assertResponseStatusCodeSame(204);
     }
 }

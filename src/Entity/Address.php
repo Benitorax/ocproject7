@@ -11,12 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Address
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private int $id;
+    use IdentifierTrait;
 
     /**
      * @Assert\Length(
@@ -27,7 +22,7 @@ class Address
      * )
      * @ORM\Column(type="string", length=255)
      */
-    private string $address;
+    private string $address = '';
 
     /**
      * @Assert\Length(
@@ -38,7 +33,7 @@ class Address
      * )
      * @ORM\Column(type="string", length=100)
      */
-    private string $city;
+    private string $city = '';
 
     /**
      * @Assert\Length(
@@ -49,12 +44,7 @@ class Address
      * )
      * @ORM\Column(type="string", length=10)
      */
-    private string $zipCode;
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
+    private string $zipCode = '';
 
     public function getAddress(): string
     {

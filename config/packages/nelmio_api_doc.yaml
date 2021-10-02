@@ -17,8 +17,7 @@ nelmio_api_doc:
                 BearerAuth:
                     type: http
                     scheme: bearer
-                    bearerFormat: JWT    
-
+                    bearerFormat: JWT 
         paths:
             /api/login_check:
                 post:
@@ -56,10 +55,6 @@ nelmio_api_doc:
                             description: Invalid JSON.
                         '401':
                             description: Invalid credentials.
-
-
-
-
         security:
             - BearerAuth: []
     areas:

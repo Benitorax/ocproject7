@@ -28,15 +28,14 @@ class PhoneController extends AppAbstractController
      *       @OA\Items(ref=@Model(type=ReadPhone::class))
      *     ))
      * )
-     * @OA\Tag(name="phones")
+     * @OA\Tag(name="Phones")
      */
     public function index(Request $request, PhoneManager $manager): Response
     {
         $page = (int) $request->query->get('page') ?: 1;
-
         $etag = $manager->getPhonesEtag($page);
 
-        if ($this->isResponseNotModified($etag, $request)) {
+        if (null !== $etag && $this->isResponseNotModified($etag, $request)) {
             $cachePhones = $manager->getCachePaginatedPhones($page);
             return $this->jsonResponseWithEtag($cachePhones, $etag);
         }
@@ -58,10 +57,9 @@ class PhoneController extends AppAbstractController
      *       ref=@Model(type=ReadPhone::class)
      *     )
      * )
-     * @OA\Response(response=403, description="Access denied.")
      * @OA\Response(response=404, description="Phone not found.")
      * @OA\Parameter(ref="#/components/parameters/id")
-     * @OA\Tag(name="phones")
+     * @OA\Tag(name="Phones")
      */
     public function show(Phone $phone, PhoneManager $manager, Request $request): Response
     {

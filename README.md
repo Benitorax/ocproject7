@@ -62,3 +62,14 @@ symfony serve -d
 
 ### Step 7: View endpoints
 To see the list of all available endpoints, go to: `127.0.0.1:8000/api/doc`.
+
+## Third-party librairies
+-   [Doctrine/Orm](https://github.com/doctrine/orm) for ORM and DBAL. 
+-   [FakerPHP](https://github.com/fakerphp/faker) to load fixtures.
+-   [Nelmio/ApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) for using the Swagger UI.
+-   [PHPUnit](https://github.com/sebastianbergmann/phpunit) to run tests.
+-   [Twig](https://github.com/twigphp/Twig) for using the Swagger UI.
+
+## Clean code
+-   [PHPStan](https://github.com/phpstan/phpstan): level 8
+-   [PHPCS](https://github.com/squizlabs/PHP_CodeSniffer): PSR1 and PSR12

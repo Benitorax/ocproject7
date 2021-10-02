@@ -12,7 +12,10 @@ class DataGenerator
 
     public const COMPANY = [
         'business' => ['mobile operator', 'internet service provider', 'hypermarket', 'supermarket', 'mobile shop'],
-        'legalStatus' => ['Sole Trader', 'Partnership', 'Limited Company', 'Limited Liability Partnership', 'Community Interest Company'],
+        'legalStatus' => [
+            'Sole Trader', 'Partnership', 'Limited Company',
+            'Limited Liability Partnership', 'Community Interest Company'
+        ],
         'size' => ['micro', 'small', 'medium'],
     ];
 
@@ -24,8 +27,14 @@ class DataGenerator
     ];
 
     public const PHONE_MODELS = [
-        'Samsung' => ['Galaxy S10', 'Galaxy S20', 'Galaxy S20 Ultra', 'Galaxy S21', 'Galaxy S21 Ultra', 'Galaxy A72', 'Galaxy A52', 'Galaxy A32'],
-        'iPhone' => ['iPhone 11', 'iPhone 11 Pro', 'iPhone 11 pro Max', 'iPhone SE 2', 'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max'],
+        'Samsung' => [
+            'Galaxy S10', 'Galaxy S20', 'Galaxy S20 Ultra', 'Galaxy S21',
+            'Galaxy S21 Ultra', 'Galaxy A72', 'Galaxy A52', 'Galaxy A32'
+        ],
+        'iPhone' => [
+            'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 pro Max', 'iPhone SE 2',
+            'iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max'
+        ],
         'Pixel' => ['Pixel 4', 'Pixel 4A', 'Pixel 4A 5G', 'Pixel 5'],
     ];
 
