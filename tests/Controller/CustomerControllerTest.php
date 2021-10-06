@@ -96,7 +96,7 @@ class CustomerControllerTest extends AppWebTestCase
             'gender' => 'Mr.',
             'firstName' => 'Chandler',
             'lastName' => 'Bing',
-            'phoneNumber' => '+14409630378',
+            'phoneNumber' => '01409630378',
             'email' => 'chandler.bing@example.com',
             'address' => [
                 'address' => '774 Schmeler Vista Suite 270',

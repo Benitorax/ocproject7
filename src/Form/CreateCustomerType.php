@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class CreateCustomerType extends AbstractType
 {
@@ -23,6 +24,7 @@ class CreateCustomerType extends AbstractType
                     'description' => 'Gender: Mr., Ms. or Miss.',
                 ],
                 'constraints' => [
+                    new NotBlank(),
                     new Choice(
                         ['Mr.', 'Ms.', 'Miss'],
                         null,
@@ -41,6 +43,7 @@ class CreateCustomerType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
+                    new Regex('#^[A-Za-z]+$#', "Only letters are valid characters"),
                     new Length([
                         'min' => 2,
                         'max' => 100,
@@ -55,6 +58,8 @@ class CreateCustomerType extends AbstractType
                     'description' => 'Last name.',
                 ],
                 'constraints' => [
+                    new NotBlank(),
+                    new Regex('#^[A-Za-z]+$#', "Only letters are valid characters"),
                     new Length([
                         'min' => 2,
                         'max' => 100,
@@ -69,6 +74,7 @@ class CreateCustomerType extends AbstractType
                     'description' => 'Email address.',
                 ],
                 'constraints' => [
+                    new NotBlank(),
                     new Length([
                         'min' => 10,
                         'max' => 255,
@@ -85,6 +91,7 @@ class CreateCustomerType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
+                    new Regex('#^[0-9]+$#', "Only numbers are valid characters"),
                     new Length([
                         'min' => 10,
                         'max' => 20,

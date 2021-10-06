@@ -5,6 +5,7 @@ namespace App\Form;
 use App\DTO\Address\Address;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,6 +38,7 @@ class AddressType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
+                    new Regex('#^[A-Za-z]+$#', "Only letters are valid characters"),
                     new Length([
                         'min' => 4,
                         'max' => 100,
@@ -52,6 +54,7 @@ class AddressType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
+                    new Regex('#^[-0-9]+$#', "Only numbers are valid characters"),
                     new Length([
                         'min' => 5,
                         'max' => 10,
