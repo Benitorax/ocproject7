@@ -41,7 +41,7 @@ class CreateCustomer
 
     private Address $address;
 
-    public function getGender(): ?string
+    public function getGender(): string
     {
         return $this->gender;
     }
@@ -53,7 +53,7 @@ class CreateCustomer
         return $this;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -65,7 +65,7 @@ class CreateCustomer
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
@@ -77,7 +77,7 @@ class CreateCustomer
         return $this;
     }
 
-    public function getAddress(): ?Address
+    public function getAddress(): Address
     {
         return $this->address;
     }
